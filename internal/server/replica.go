@@ -13,7 +13,6 @@ type Replica interface {
 }
 
 type LoggedServer struct {
-	*http.Server
 	Router
 	lst net.Listener
 	completeAddr *net.TCPAddr
@@ -25,8 +24,19 @@ type LoggedServer struct {
 	inMemoryDB cache.Bcache
 }
 
-func NewLoggedServer() *LoggedServer {
+func NewLoggedServer(addr, port string, c cache.Bcache) *LoggedServer {
+	tcpAddr, err := net.ResolveTCPAddr("tcp", net.JoinHostPort(addr, port))
+	if err != nil {
+		return nil
+	}
+
 	return &LoggedServer{
+		addr: addr,
+		port: port,
+		completeAddr: tcpAddr,
+		signaler: make(chan struct{}),
+		wakeUp: make(chan struct{}),
+		inMemoryDB: c,
 	}
 }
 
