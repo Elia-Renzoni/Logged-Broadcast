@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"log-b/cache"
 )
 
 func addNodeToCluster() http.Handler {
@@ -11,21 +12,21 @@ func addNodeToCluster() http.Handler {
 	)
 }
 
-func setKVBucket() http.Handler {
+func setKVBucket(volatileBucketer cache.MemoryCache) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 		},
 	)
 }
 
-func removeKvBucket() http.Handler {
+func removeKvBucket(volatileBucketer cache.MemoryCache) http.Handler {
 	return http.HandlerFunc(
 		func (w http.ResponseWriter, r *http.Request) {
 		},
 	)
 }
 
-func fetchKvBucket() http.Handler {
+func fetchKvBucket(volatileBucketer cache.MemoryCache) http.Handler {
 	return http.HandlerFunc(
 		func (w http.ResponseWriter, r *http.Request) {
 		},

@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 	"net/url"
+	"log-b/cache"
 )
 
 const (
@@ -29,12 +30,12 @@ func (ro Router) ServeRequest(w http.ResponseWriter, r *http.Request) {
 	matchedHandler.ServeHTTP(w, r)
 }
 
-func InitRouter() Router {
+func InitRouter(bucketer cache.MemoryCache) Router {
 	return Router{
 		ADD_NODE: addNodeToCluster(),
-		SET_DATA: setKVBucket(),
-		DELETE_DATA: removeKvBucket(),
-		GET_DATA: fetchKvBucket(),
+		SET_DATA: setKVBucket(bucketer),
+		DELETE_DATA: removeKvBucket(bucketer),
+		GET_DATA: fetchKvBucket(bucketer),
 	}
 }
 
