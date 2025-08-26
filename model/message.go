@@ -11,6 +11,10 @@ type BasicError struct {
 	Error string `json:"err"`
 }
 
+type BasicPositiveAck struct {
+	Succ string `json:"succ"`
+}
+
 type PersistentMessage struct {
 	Sinfo Sender
 	Cinfo MessageContent
