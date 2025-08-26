@@ -4,31 +4,71 @@ import (
 	"database/sql"
 	"time"
 	"log-b/model"
+	"sync/atomic"
+	"errors"
+	"context"
 )
 
 type Storage interface {
-	WriteMessage()
+	StartDB() error
+	WriteMessage(content model.PersistentMessage) error
 	RetrieveMessage()
+	ShutdownDB()
 }
 
 type LogDB struct {
 	instance *sql.DB
 	pingerTime time.Duration
 	tick *time.Ticker
-	faultyStatus bool 
+	faultyStatus atomic.Bool
+	dbCtx context.Context
 }
 
 func NewDB() *LogDB {
 	l := &LogDB{
 		pingerTime: 3 * time.Second,
-		faultyStatus: false,
+		dbCtx: context.Background(),
 	}
 	
-	go l.pinger()
 	return l
 }
 
-func (l *LogDB) WriteMessage() {
+func (l *LogDB) WriteMessage(content model.PersistentMessage) error {
+	var (
+		senderInfo = content.Sinfo
+		messageContent = content.Cinfo
+	)
+
+	fCheck, sCheck := emptynessChecker(senderInfo), emptynessChecker(messageContent)
+
+	if !((fCheck || sCheck) && !l.faultyStatus.Load()) {
+		return errors.New("Write Operations Aborted Before Completion")
+	}
+
+	// TODO -> add queries...
+
+	return nil
+}
+
+func (l *LogDB) StartDB() error {
+	var err error
+
+	l.instance, err = sql.Open("sqlite", "logger.db")
+	if err != nil {
+		return err
+	}
+	
+	l.instance.SetMaxOpenConns(30)
+	l.instance.SetConnMaxIdleTime(2 * time.Second)
+	l.instance.SetMaxIdleConns(5)
+
+	errInt := l.setDBInternals()
+	go l.pinger()
+
+	return errInt
+}
+
+func (l *LogDB) ShutdownDB() {
 
 }
 
@@ -46,11 +86,63 @@ func (l *LogDB) pinger() {
 	for range l.tick.C {
 		err = l.instance.Ping()
 		if err != nil {
-			l.faultyStatus = true
+			l.faultyStatus.Store(true)
 		} else {
-			if l.faultyStatus {
-				l.faultyStatus = false
+			if l.faultyStatus.Load() {
+				l.faultyStatus.Store(false)
 			}
 		}
 	}
+}
+
+func emptynessChecker(msg any) bool {
+	var ok bool 
+
+	switch value := msg.(type) {
+	case model.Sender:
+		ok = check(value.Addr, value.Port)
+	case model.MessageContent:
+		ok = check(value.Endpoint, value.Key, value.Value)
+	}
+
+	return ok
+}
+
+func check(content ...string) bool {
+	for _, c := range content {
+		if c == "" {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (l *LogDB) setDBInternals() error {
+	var (
+		result sql.Result
+		err error
+	)
+
+	result, err = l.instance.ExecContext(l.dbCtx, CREATE_DB, nil)
+	if err != nil || result == nil {
+		return err
+	}
+
+	result, err = l.instance.ExecContext(l.dbCtx, CREATE_TABLE_MESSAGE, nil)
+	if err != nil || result == nil {
+		return err
+	}
+
+	result, err = l.instance.ExecContext(l.dbCtx, CREATE_TABLE_SENDER, nil)
+	if err != nil || result == nil {
+		return err
+	}
+
+	result, err = l.instance.ExecContext(l.dbCtx, CREATE_TRIGGER, nil)
+	if err != nil || result == nil {
+		return err
+	}
+
+	return nil
 }

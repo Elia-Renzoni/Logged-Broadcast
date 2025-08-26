@@ -3,10 +3,9 @@ package server
 import (
 	"encoding/json"
 	"io"
-	"ioutil"
-	"log-b/broadcaster"
-	"log-b/cache"
-	"log-b/cluster"
+	"log-b/internal/broadcaster"
+	"log-b/internal/cache"
+	"log-b/internal/cluster"
 	"log-b/model"
 	"net/http"
 )
@@ -17,14 +16,14 @@ func addNodeToCluster() http.Handler {
 			var msg model.BasicMessage
 			defer r.Body.Close()
 
-			body, err := ioutil.ReadAll(r.Body)
+			body, err := io.ReadAll(r.Body)
 			if err != nil {
-				nack(w)
+				nack(w, err)
 				return
 			}
 
-			if err := json.Unmarhsal(body, &msg); err != nil {
-				nack(w)
+			if err := json.Unmarshal(body, &msg); err != nil {
+				nack(w, err)
 				return
 			}
 
@@ -56,6 +55,23 @@ func fetchKvBucket(volatileBucketer cache.MemoryCache) http.Handler {
 	)
 }
 
-func nack(w io.Writer) {
+func nack(w io.Writer, err error) {
+	rw, ok := w.(http.ResponseWriter)
+	if ok {
+		rw.Header().Set("Content-Type", "application/json")
+		rw.WriteHeader(http.StatusBadRequest)
+	}
+	payload, err := json.Marshal(model.BasicError{
+		Error: err.Error(),
+	})
+
+	if err != nil  {
+		w.Write([]byte(err.Error()))
+		return
+	}
+	w.Write(payload)
+}
+
+func ack(w io.Writer) {
 
 }

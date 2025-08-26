@@ -4,33 +4,43 @@ import (
 	"bytes"
 	"context"
 	"log"
-	"log-b/cluster"
-	"log-b/server"
+	"log-b/internal/cluster"
 	"net/http"
+	"time"
+	"errors"
 )
 
-const header string = "application/json"
+const (
+	header string = "application/json"
+	ADD_NODE string = "/add-node"
+	SET_DATA string = "/set-data"
+	DELETE_DATA string = "/delete-data"
+)
 
 func DoBroadcast(message []byte, methodRouter string) bool {
 	var memberlist = cluster.GetFullMembershipList()
-	var c ackCounter
 
-	for _, node := range memberlist {
-		eval, err := send(node, message, methodRouter)
-		if err != nil {
-			log.Fatal(err.Error())
+	do := func() bool {
+		var c ackCounter
+		for _, node := range memberlist {
+			eval, err := send(node, message, methodRouter)
+			if err != nil {
+				log.Fatal(err.Error())
+			}
+
+			if eval {
+				c.inc()
+			}
 		}
 
-		if eval {
-			c.inc()
+		if c.isMajorityQourumReached() {
+			return true
 		}
-	}
 
-	if c.isMajorityQourumReached() {
-		return true
+		return false
 	}
-
-	return false
+	
+	return do()
 }
 
 func send(addr string, msg []byte, methodRouter string) (bool, error) {
@@ -68,6 +78,7 @@ func send(addr string, msg []byte, methodRouter string) (bool, error) {
 	}
 
 	result := ackProcessing(res)
+	return result, nil
 }
 
 func ackProcessing(res *http.Response) bool {

@@ -1,7 +1,7 @@
 package broadcaster
 
 import (
-	"log-b/cluster"
+	"log-b/internal/cluster"
 )
 
 type ackCounter int

@@ -9,10 +9,9 @@ CREATE TABLE IF NOT EXISTS Buffer (
 	logState INTEGER NOT NULL,
 	senderID INTEGER NOT NULL,
 	messageID INTEGER NOT NULL,
-	CHECK (logState == 0 OR logState == 1),
 	PRIMARY KEY(logID),
-	CONSTRAINTS FOREIGN KEY Sender(senderID),
-	CONSTRAINTS FOREIGN KEY Message(messageID)
+	FOREIGN KEY (senderID) REFERENCES Sender(senderID),
+	FOREIGN KEY (messageID) REFERENCES Message(messageID)
 );
 
 CREATE TABLE IF NOT EXISTS Sender (
@@ -29,6 +28,11 @@ CREATE TABLE IF NOT EXISTS Message (
 	messageValue TEXT NOT NULL,
 	PRIMARY KEY(messageID)
 );
+
+CREATE TRIGGER inserter AFTER INSERT ON Message
+BEGIN
+	INSERT INTO Buffer (logState, senderID, messageID) VALUES (?, ?, ?);
+END;
 
 /* select N pending message to reconstruct the 
  * pending buffer */
