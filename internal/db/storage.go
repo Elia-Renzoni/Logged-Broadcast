@@ -56,8 +56,11 @@ func (l *LogDB) WriteMessage(content model.PersistentMessage, opType uint8) erro
 	sId, _ := sResult.LastInsertId()
 
 	_, err := l.instance.ExecContext(l.dbCtx, INSERT_BUFFER, opType, fId, sId)
+	if err != nil {
+		return errors.New("Impossible to Operate final INSERT statements")
+	}
 
-	return err
+	return nil
 }
 
 func (l *LogDB) StartDB() error {

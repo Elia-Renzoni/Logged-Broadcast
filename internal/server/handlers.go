@@ -9,6 +9,7 @@ import (
 	"log-b/internal/cluster"
 	"log-b/model"
 	"net/http"
+	"log-b/internal/db"
 )
 
 func addNodeToCluster() http.Handler {
@@ -35,7 +36,7 @@ func addNodeToCluster() http.Handler {
 	)
 }
 
-func setKVBucket(volatileBucketer cache.MemoryCache) http.Handler {
+func setKVBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			defer r.Body.Close() 
@@ -63,14 +64,29 @@ func setKVBucket(volatileBucketer cache.MemoryCache) http.Handler {
 				nack(w, maErr)
 				return
 			}
+
+			dbErr := buffer.WriteMessage(model.PersistentMessage{
+				Sinfo: model.Sender{Addr: r.RemoteAddr, Port: "undefined"},
+				Cinfo: model.MessageContent{Endpoint: SET_DATA, Key: msg.Key, Value: msg.Value},
+			}, 0)
+			if dbErr != nil {
+				nack(w, dbErr)
+				return
+			}
 			ack(w, data)
 
-			ok := broadcaster.DoBroadcast(body, SET_DATA)
+			majorityReached := broadcaster.DoBroadcast(body, SET_DATA)
+			
+			// if the majority quorum is reached
+			// change the status to DELIVERED
+			if majorityReached {
+				// TODO -> change status
+			}
 		},
 	)
 }
 
-func removeKvBucket(volatileBucketer cache.MemoryCache) http.Handler {
+func removeKvBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 		},
