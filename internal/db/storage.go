@@ -11,7 +11,7 @@ import (
 
 type Storage interface {
 	StartDB() error
-	WriteMessage(content model.PersistentMessage) error
+	WriteMessage(content model.PersistentMessage, opType uint8) error
 	RetrieveMessage()
 	ShutdownDB()
 }
@@ -33,7 +33,7 @@ func NewDB() *LogDB {
 	return l
 }
 
-func (l *LogDB) WriteMessage(content model.PersistentMessage) error {
+func (l *LogDB) WriteMessage(content model.PersistentMessage, opType uint8) error {
 	var (
 		senderInfo = content.Sinfo
 		messageContent = content.Cinfo
@@ -45,9 +45,19 @@ func (l *LogDB) WriteMessage(content model.PersistentMessage) error {
 		return errors.New("Write Operations Aborted Before Completion")
 	}
 
-	// TODO -> add queries...
+	fResult, fErr := l.instance.ExecContext(l.dbCtx, INSERT_SENDER, senderInfo.Addr, senderInfo.Port)
+	sResult, sErr := l.instance.ExecContext(l.dbCtx, INSERT_MESSAGE, messageContent.Endpoint, messageContent.Key, messageContent.Value)
 
-	return nil
+	if fErr != nil || sErr != nil {
+		return errors.New("Impossible to Operate INSERT statements")
+	}
+
+	fId, _ := fResult.LastInsertId()
+	sId, _ := sResult.LastInsertId()
+
+	_, err := l.instance.ExecContext(l.dbCtx, INSERT_BUFFER, opType, fId, sId)
+
+	return err
 }
 
 func (l *LogDB) StartDB() error {
@@ -69,7 +79,7 @@ func (l *LogDB) StartDB() error {
 }
 
 func (l *LogDB) ShutdownDB() {
-
+	l.instance.Close()
 }
 
 // only for the recovery session
@@ -135,11 +145,6 @@ func (l *LogDB) setDBInternals() error {
 	}
 
 	result, err = l.instance.ExecContext(l.dbCtx, CREATE_TABLE_SENDER, nil)
-	if err != nil || result == nil {
-		return err
-	}
-
-	result, err = l.instance.ExecContext(l.dbCtx, CREATE_TRIGGER, nil)
 	if err != nil || result == nil {
 		return err
 	}
