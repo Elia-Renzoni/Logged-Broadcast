@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"log-b/internal/broadcaster"
 	"log-b/internal/cache"
@@ -48,6 +49,11 @@ func setKVBucket(volatileBucketer cache.MemoryCache) http.Handler {
 			var msg model.BasicMessage
 			if jsonErr := json.Unmarshal(body, &msg); jsonErr != nil {
 				nack(w, jsonErr)
+				return
+			}
+
+			if msg.Key == "" || msg.Value == "" {
+				nack(w, errors.New("Empty Payload Elements!"))
 				return
 			}
 
