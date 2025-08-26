@@ -64,6 +64,8 @@ func setKVBucket(volatileBucketer cache.MemoryCache) http.Handler {
 				return
 			}
 			ack(w, data)
+
+			ok := broadcaster.DoBroadcast(body, SET_DATA)
 		},
 	)
 }
