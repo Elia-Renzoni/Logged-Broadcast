@@ -9,7 +9,7 @@ import (
 type MemoryCache interface {
 	OpenDB()
 	SetBucket(key, value string)
-	DeleteBucket(key string)
+	DeleteBucket(key string) error
 	FetchBucket(key string) string
 }
 
@@ -37,13 +37,12 @@ func (b Bcache) SetBucket(key, value string) {
 	}
 }
 
-func (b Bcache) DeleteBucket(key string) {
+func (b Bcache) DeleteBucket(key string) error {
 	err := b.db.Update(func(txn *badger.Txn) error {
 		return txn.Delete([]byte(key))
 	})
-	if err != nil {
-		return
-	}
+
+	return err
 }
 
 func (b Bcache) FetchBucket(key string) string {

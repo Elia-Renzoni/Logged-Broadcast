@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"strings"
 	"log-b/internal/broadcaster"
 	"log-b/internal/cache"
 	"log-b/internal/cluster"
@@ -89,6 +90,14 @@ func setKVBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.Han
 func removeKvBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
+			splitted := strings.Split(r.URL.Path, "/")
+			param := splitted[2]
+			
+			if err := volatileBucketer.DeleteBucket(param); err != nil {
+				nack(w, err)
+				return
+			}
+			ack(w, []byte("Bucket Succesfully Removed!"))
 		},
 	)
 }
@@ -96,6 +105,14 @@ func removeKvBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.
 func fetchKvBucket(volatileBucketer cache.MemoryCache) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
+			splitted := strings.Split(r.URL.Path, "/")
+			param := splitted[2]
+
+			if value := volatileBucketer.FetchBucket(param); value != "" {
+				ack(w, []byte(value))
+				return
+			}
+			nack(w, errors.New("Key Not Found!"))
 		},
 	)
 }
