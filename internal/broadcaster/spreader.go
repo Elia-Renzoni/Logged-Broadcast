@@ -17,13 +17,14 @@ const (
 	DELETE_DATA string = "/delete-data"
 )
 
-func DoBroadcast(message []byte, methodRouter string) bool {
+func DoBroadcast(message []byte, methodRouter string, addrWithEndpoints string) bool {
 	var memberlist = cluster.GetFullMembershipList()
 
 	do := func() bool {
 		var c ackCounter
 		for _, node := range memberlist {
-			eval, err := send(node, message, methodRouter)
+			destination := node + addrWithEndpoints
+			eval, err := send(destination, message, methodRouter)
 			if err != nil {
 				log.Fatal(err.Error())
 			}
@@ -64,7 +65,7 @@ func send(addr string, msg []byte, methodRouter string) (bool, error) {
 		res, err = client.Do(req)
 
 	case DELETE_DATA:
-		req, err = http.NewRequestWithContext(ctx, http.MethodDelete, addr, bytes.NewBuffer(msg))
+		req, err = http.NewRequestWithContext(ctx, http.MethodDelete, addr, nil)
 		if err != nil {
 			return false, errors.New(errorMaker(err))
 		}

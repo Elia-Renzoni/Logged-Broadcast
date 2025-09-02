@@ -13,6 +13,12 @@ import (
 	"log-b/internal/db"
 )
 
+const (
+	POST_ADD_NODE string = "/join"
+	POST_SET_BUCKET string = "/addbk"
+	DELETE_BUCKET string = "/delbk"
+)
+
 func addNodeToCluster() http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
@@ -31,8 +37,7 @@ func addNodeToCluster() http.Handler {
 			}
 
 			cluster.AddMember(msg.Node)
-			// maybe is not useful...
-			broadcaster.DoBroadcast(body, ADD_NODE)
+			broadcaster.DoBroadcast(body, ADD_NODE, POST_ADD_NODE)
 		},
 	)
 }
@@ -76,7 +81,7 @@ func setKVBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.Han
 			}
 			ack(w, data)
 
-			majorityReached := broadcaster.DoBroadcast(body, SET_DATA)
+			majorityReached := broadcaster.DoBroadcast(body, SET_DATA, POST_SET_BUCKET)
 			
 			// if the majority quorum is reached
 			// change the status to DELIVERED
@@ -96,6 +101,10 @@ func removeKvBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.
 			if err := volatileBucketer.DeleteBucket(param); err != nil {
 				nack(w, err)
 				return
+			}
+			majorityReached := broadcaster.DoBroadcast(nil, DELETE_DATA, DELETE_BUCKET)
+			if majorityReached {
+				// delete from persistent storage...
 			}
 			ack(w, []byte("Bucket Succesfully Removed!"))
 		},
