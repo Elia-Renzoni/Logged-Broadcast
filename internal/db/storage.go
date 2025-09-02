@@ -13,6 +13,7 @@ type Storage interface {
 	StartDB() error
 	WriteMessage(content model.PersistentMessage, opType uint8) error
 	RetrieveMessage()
+	DeleteMessage(searchKey string) error
 	ShutdownDB()
 }
 
@@ -22,6 +23,7 @@ type LogDB struct {
 	tick *time.Ticker
 	faultyStatus atomic.Bool
 	dbCtx context.Context
+	tx *sql.Tx
 }
 
 func NewDB() *LogDB {
@@ -59,6 +61,29 @@ func (l *LogDB) WriteMessage(content model.PersistentMessage, opType uint8) erro
 	if err != nil {
 		return errors.New("Impossible to Operate final INSERT statements")
 	}
+
+	return nil
+}
+
+func (l *LogDB) DeleteMessage(searchKey string) error {
+	if searchKey == "" {
+		return errors.New("Delete Message Operation Aborted due to empty search key")
+	}
+
+	tx, err := l.instance.BeginTx(l.dbCtx, nil)
+	tx.
+
+	result, err := l.instance.ExecContext(l.dbCtx, DELETE_MESSAGE, searchKey)
+	if err != nil {
+		return errors.New("Some Errors Occured When Tried to Perform a Delete Message Operation " + err)
+	}
+
+	if result == nil {
+		return errors.New("Some Errors Occured When Tried to Peform a Delete Message Operation")
+	}
+
+	// if the message is now properly deleted the server can delete
+	// the sender infos
 
 	return nil
 }
@@ -153,4 +178,12 @@ func (l *LogDB) setDBInternals() error {
 	}
 
 	return nil
+}
+
+func (l *LogDB) queryMessageTable() {
+
+}
+
+func (l *LogDB) deleteFromBuffer() {
+
 }

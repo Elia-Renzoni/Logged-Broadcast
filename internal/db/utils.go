@@ -8,7 +8,8 @@ const (
 	INSERT_BUFFER string = "INSERT INTO Buffer (logState, senderID, messageID) VALUES (?, ?, ?);"
 	INSERT_SENDER string = "INSERT INTO Sender VALUES (senderAddr, senderPort) VALUES (?, ?);"
 	INSERT_MESSAGE string = "INSERT INTO Message VALUES (messageEndpoint, messageKey, messageValue) VALUES (?, ?);"
-	DELETE_MESSAGE string = ""
-	DELETE_SENDER string = ""
+	DELETE_MESSAGE string = "DELETE FROM Message WHERE messageKey = ?"
+	DELETE_SENDER string = "DELETE FROM Sender WHERE senderID = ?"
+	FETCH_SENDER_FROM_MESSAGE string = "SELECT "
+	DELETE_ENTRIES_FROM_BUFFER string = ""
 )
-	
