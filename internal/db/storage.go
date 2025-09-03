@@ -85,6 +85,8 @@ func (l *LogDB) DeleteMessage(searchKey string) error {
 	// if the message is now properly deleted the server can delete
 	// the sender infos
 
+	
+
 	return nil
 }
 
@@ -180,10 +182,36 @@ func (l *LogDB) setDBInternals() error {
 	return nil
 }
 
-func (l *LogDB) queryMessageTable() {
+// this method is responsible of 
+// querying the Message Table
+// in order to retreive the messageId by
+// searching the messageKey
+// TODO -> handle in a better way the errors
+func (l *LogDB) getMessageID(messageKey string) int {
+	var messageId int
 
+	rows, err := l.tx.QueryContext(l.dbCtx, FETCH_MESSAGE_ID, messageKey)
+	if err != nil {
+		return -1
+	}
+
+	for rows.Next() {
+		if err := rows.Scan(&messageId); err != nil {
+			return -1
+		}
+	}
+
+	cerr := rows.Close()
+	if cerr != nil {
+		return -1
+	}
+	
+	// TO END...
 }
 
+// this method is responsible of
+// deleting the content from
+// the Buffer Table
 func (l *LogDB) deleteFromBuffer() {
 
 }

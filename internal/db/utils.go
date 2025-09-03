@@ -10,6 +10,6 @@ const (
 	INSERT_MESSAGE string = "INSERT INTO Message VALUES (messageEndpoint, messageKey, messageValue) VALUES (?, ?);"
 	DELETE_MESSAGE string = "DELETE FROM Message WHERE messageKey = ?"
 	DELETE_SENDER string = "DELETE FROM Sender WHERE senderID = ?"
-	FETCH_SENDER_FROM_MESSAGE string = "SELECT "
+	FETCH_MESSAGE_ID string = "SELECT Message.messageID FROM Message WHERE Message.messageKey = ?"
 	DELETE_ENTRIES_FROM_BUFFER string = ""
 )
