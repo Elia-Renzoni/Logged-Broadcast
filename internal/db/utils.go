@@ -11,5 +11,5 @@ const (
 	DELETE_MESSAGE string = "DELETE FROM Message WHERE messageKey = ?"
 	DELETE_SENDER string = "DELETE FROM Sender WHERE senderID = ?"
 	FETCH_MESSAGE_ID string = "SELECT Message.messageID FROM Message WHERE Message.messageKey = ?"
-	DELETE_ENTRIES_FROM_BUFFER string = ""
+	DELETE_ENTRIES_FROM_BUFFER string = "DELETE FROM Buffer WHERE messageID = ? AND senderID = ?"
 )
