@@ -28,25 +28,3 @@ CREATE TABLE IF NOT EXISTS Message (
 	messageValue TEXT NOT NULL,
 	PRIMARY KEY(messageID)
 );
-
-CREATE TRIGGER inserter AFTER INSERT ON Message
-BEGIN
-	INSERT INTO Buffer (logState, senderID, messageID) VALUES (?, ?, ?);
-END;
-
-/* select N pending message to reconstruct the 
- * pending buffer */
-/** 
-* this query will be triggered in the recovery
-* session.
-*/
-/*
- * TODO -> end the following select query
-*/
-SELECT messageID, messageEndpoint, messageKey, messageValue
-FROM Buffer
-WHERE Buffer.messageID IN (
-	SELECT messageID
-	FROM Message
-	GROUP BY messageKey
-);
