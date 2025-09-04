@@ -70,10 +70,10 @@ func (l *LogDB) DeleteMessage(searchKey string) error {
 		return errors.New("Delete Message Operation Aborted due to empty search key")
 	}
 
-	tx, err := l.instance.BeginTx(l.dbCtx, nil)
-	tx.
+	var err error
+	l.tx, err = l.instance.BeginTx(l.dbCtx, nil)
 
-	result, err := l.instance.ExecContext(l.dbCtx, DELETE_MESSAGE, searchKey)
+	result, err := tx.ExecContext(l.dbCtx, DELETE_MESSAGE, searchKey)
 	if err != nil {
 		return errors.New("Some Errors Occured When Tried to Perform a Delete Message Operation " + err)
 	}
@@ -84,8 +84,10 @@ func (l *LogDB) DeleteMessage(searchKey string) error {
 
 	// if the message is now properly deleted the server can delete
 	// the sender infos
-
-	
+	result := l.getMessageID(searchKey)
+	if result == -1 {
+		tx.Rollback()
+	}
 
 	return nil
 }
@@ -205,13 +207,17 @@ func (l *LogDB) getMessageID(messageKey string) int {
 	if cerr != nil {
 		return -1
 	}
-	
-	// TO END...
+
 }
 
 // this method is responsible of
 // deleting the content from
 // the Buffer Table
 func (l *LogDB) deleteFromBuffer() {
+
+}
+
+
+func (l *LogDB) getSenderId() int {
 
 }
