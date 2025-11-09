@@ -4,7 +4,8 @@ import (
 	"net/http"
 	"net"
 	"log"
-	"log-b/cache"
+	"log-b/internal/cache"
+	"log-b/internal/db"
 )
 
 type Replica interface {
@@ -22,9 +23,10 @@ type LoggedServer struct {
 	wakeUp chan struct{}
 	networkErr error
 	inMemoryDB cache.Bcache
+	persistentDB *db.LogDB
 }
 
-func NewLoggedServer(addr, port string, c cache.Bcache) *LoggedServer {
+func NewLoggedServer(addr, port string, c cache.Bcache, d *db.LogBD) *LoggedServer {
 	tcpAddr, err := net.ResolveTCPAddr("tcp", net.JoinHostPort(addr, port))
 	if err != nil {
 		return nil
@@ -37,6 +39,7 @@ func NewLoggedServer(addr, port string, c cache.Bcache) *LoggedServer {
 		signaler: make(chan struct{}),
 		wakeUp: make(chan struct{}),
 		inMemoryDB: c,
+		persistentDB: d,
 	}
 }
 
@@ -53,7 +56,7 @@ func (ls *LoggedServer) BindTCP() {
 
 func (ls *LoggedServer) ServeConns() {
 	<- ls.wakeUp
-	r := InitRouter(ls.inMemoryDB)
+	r := InitRouter(ls.inMemoryDB, ls.persistentDB)
 	http.Serve(ls.lst, http.HandlerFunc(r.ServeRequest))
 }
 
