@@ -23,8 +23,8 @@ func DoBroadcast(message []byte, methodRouter string, addrWithEndpoints string) 
 	do := func() bool {
 		var c ackCounter
 		for _, node := range memberlist {
-			destination := node + addrWithEndpoints
-			eval, err := send(destination, message, methodRouter)
+			endsystem := node + addrWithEndpoints
+			eval, err := send(endsystem, message, methodRouter)
 			if err != nil {
 				log.Fatal(err.Error())
 			}
@@ -34,11 +34,7 @@ func DoBroadcast(message []byte, methodRouter string, addrWithEndpoints string) 
 			}
 		}
 
-		if c.isMajorityQourumReached() {
-			return true
-		}
-
-		return false
+		return c.isMajorityQourumReached()
 	}
 	
 	return do()
@@ -78,15 +74,11 @@ func send(addr string, msg []byte, methodRouter string) (bool, error) {
 		return false, errors.New(errorMaker(err))
 	}
 
-	result := ackProcessing(res)
-	return result, nil
+	return ackProcessing(res), nil
 }
 
 func ackProcessing(res *http.Response) bool {
-	if res.StatusCode == 201 || res.StatusCode == 200 {
-		return true
-	}
-	return false
+	return res.StatusCode == 201 || res.StatusCode == 200
 }
 
 func errorMaker(err error) string {
