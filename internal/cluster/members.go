@@ -6,8 +6,10 @@ import (
 	"slices"
 )
 
-var pGroup = []string{}
-var lock sync.Mutex
+var (
+	pGroup = []string{}
+        lock sync.Mutex
+)
 
 func AddMember(addr string) error {
 	lock.Lock()
