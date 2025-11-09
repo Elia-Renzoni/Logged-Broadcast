@@ -18,12 +18,12 @@ type Storage interface {
 }
 
 type LogDB struct {
-	instance *sql.DB
-	pingerTime time.Duration
-	tick *time.Ticker
+	instance     *sql.DB
+	pingerTime   time.Duration
+	tick         *time.Ticker
 	faultyStatus atomic.Bool
-	dbCtx context.Context
-	tx *sql.Tx
+	dbCtx        context.Context
+	tx           *sql.Tx
 }
 
 func NewDB() *LogDB {
