@@ -11,9 +11,9 @@ import (
 )
 
 const (
-	header string = "application/json"
-	ADD_NODE string = "/add-node"
-	SET_DATA string = "/set-data"
+	header      string = "application/json"
+	ADD_NODE    string = "/add-node"
+	SET_DATA    string = "/set-data"
 	DELETE_DATA string = "/delete-data"
 )
 
