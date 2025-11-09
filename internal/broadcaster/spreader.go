@@ -34,7 +34,7 @@ func DoBroadcast(message []byte, methodRouter string, addrWithEndpoints string) 
 			}
 		}
 
-		return c.isMajorityQourumReached()
+		return c.isMajorityQuorumReached()
 	}
 	
 	return do()

@@ -10,7 +10,7 @@ func (a *ackCounter) inc() {
 	*a += 1
 }
 
-func (a ackCounter) isMajorityQourumReached() bool {
+func (a ackCounter) isMajorityQuorumReached() bool {
 	group := cluster.GetFullMembershipList()
 	var quorum = len(group) / 2
 
