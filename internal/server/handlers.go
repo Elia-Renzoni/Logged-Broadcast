@@ -14,9 +14,9 @@ import (
 )
 
 const (
-	POST_ADD_NODE string = "/join"
+	POST_ADD_NODE   string = "/join"
 	POST_SET_BUCKET string = "/addbk"
-	DELETE_BUCKET string = "/delbk"
+	DELETE_BUCKET   string = "/delbk"
 )
 
 func addNodeToCluster() http.Handler {
