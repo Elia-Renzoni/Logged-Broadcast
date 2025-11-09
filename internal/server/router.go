@@ -9,10 +9,10 @@ import (
 )
 
 const (
-	ADD_NODE = "/add-node"
-	SET_DATA = "/set-data"
+	ADD_NODE    = "/add-node"
+	SET_DATA    = "/set-data"
 	DELETE_DATA = "/delete-data"
-	GET_DATA = "/get-data"
+	GET_DATA    = "/get-data"
 )
 
 type Router map[string]http.Handler
