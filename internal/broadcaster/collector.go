@@ -14,9 +14,5 @@ func (a ackCounter) isMajorityQourumReached() bool {
 	group := cluster.GetFullMembershipList()
 	var quorum = len(group) / 2
 
-
-	if a > quorum {
-		return true
-	}
-	return false
+	return int(a) > quorum
 }
