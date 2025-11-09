@@ -15,30 +15,30 @@ type Replica interface {
 
 type LoggedServer struct {
 	Router
-	lst net.Listener
+	lst          net.Listener
 	completeAddr *net.TCPAddr
-	addr string
-	port string
-	signaler chan struct{}
-	wakeUp chan struct{}
-	networkErr error
-	inMemoryDB cache.Bcache
+	addr         string
+	port         string
+	signaler     chan struct{}
+	wakeUp       chan struct{}
+	networkErr   error
+	inMemoryDB   cache.Bcache
 	persistentDB *db.LogDB
 }
 
-func NewLoggedServer(addr, port string, c cache.Bcache, d *db.LogBD) *LoggedServer {
+func NewLoggedServer(addr, port string, c cache.Bcache, d *db.LogDB) *LoggedServer {
 	tcpAddr, err := net.ResolveTCPAddr("tcp", net.JoinHostPort(addr, port))
 	if err != nil {
 		return nil
 	}
 
 	return &LoggedServer{
-		addr: addr,
-		port: port,
+		addr:         addr,
+		port:         port,
 		completeAddr: tcpAddr,
-		signaler: make(chan struct{}),
-		wakeUp: make(chan struct{}),
-		inMemoryDB: c,
+		signaler:     make(chan struct{}),
+		wakeUp:       make(chan struct{}),
+		inMemoryDB:   c,
 		persistentDB: d,
 	}
 }
@@ -59,4 +59,3 @@ func (ls *LoggedServer) ServeConns() {
 	r := InitRouter(ls.inMemoryDB, ls.persistentDB)
 	http.Serve(ls.lst, http.HandlerFunc(r.ServeRequest))
 }
-
