@@ -8,9 +8,9 @@ import (
 )
 
 type StartUp struct {
-	address string
+	address    string
 	listenPort string
-	seed bool 
+	seed       bool 
 }
 
 var conf StartUp
