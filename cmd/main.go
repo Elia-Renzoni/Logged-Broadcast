@@ -25,7 +25,7 @@ func init() {
 	)
 	flag.Parse()
 
-	conf = StartUp{
+	conf = StartUp {
 		address:    *addr,
 		listenPort: *port,
 		seed:       *sFlag,
