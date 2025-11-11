@@ -1,11 +1,5 @@
 package db
 
-const (
-	DELETE_SENDER string = "DELETE FROM Sender WHERE senderID = ?"
-	FETCH_MESSAGE_ID string = "SELECT Message.messageID FROM Message WHERE Message.messageKey = ?"
-	DELETE_ENTRIES_FROM_BUFFER string = "DELETE FROM Buffer WHERE messageID = ? AND senderID = ?"
-)
-
 var createDB string = `
                         CREATE DB loggerb;
 		      `
@@ -51,4 +45,16 @@ var deleteMessageStmt string = `
  				 DELETE FROM Message
 				 WHERE messageKey = ?;
 			       `
-
+var deleteSenderStmt string = `
+				DELETE FROM Sender
+				WHERE senderID = ?;
+			      `
+var fetchMessageIDStmt string = `
+				SELECT Message.messageID
+				FROM Message
+				WHERE Message.messageKey = ?;
+				`
+var deleteEntriesFromBufferStmt string = `
+					DELETE FROM Buffer
+					WHERE messageID = ? AND senderID = ?;
+					 `
