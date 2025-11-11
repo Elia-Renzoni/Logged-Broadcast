@@ -16,7 +16,10 @@ func TestFetchBucket(t *testing.T) {
 	if value != "testValue" {
 		t.Fail()
 	}
+
+	cache.CloseDB()
 }
+
 
 func TestDeleteBucket(t *testing.T) {
 	var cache = memory.Bcache{}
@@ -27,4 +30,6 @@ func TestDeleteBucket(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%s", err.Error())
 	}
+
+	cache.CloseDB()
 }

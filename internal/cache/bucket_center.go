@@ -19,7 +19,7 @@ type Bcache struct {
 	opts badger.Options
 }
 
-func (b Bcache) OpenDB() {
+func (b *Bcache) OpenDB() {
 	b.opts = badger.DefaultOptions("./cache")
 	b.db, b.err = badger.Open(b.opts)
 	if b.err != nil {
@@ -27,10 +27,13 @@ func (b Bcache) OpenDB() {
 	}
 }
 
+func (b *Bcache) CloseDB() {
+	b.db.Close()
+}
+
 func (b Bcache) SetBucket(key, value string) {
 	err := b.db.Update(func(txn *badger.Txn) error {
 		return txn.Set([]byte(key), []byte(value))
-	
 	})
 	if err != nil {
 		return
@@ -67,5 +70,4 @@ func (b Bcache) FetchBucket(key string) string {
 	builder.Write(value)
 	return builder.String()
 }
-
 
