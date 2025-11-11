@@ -82,6 +82,5 @@ func ackProcessing(res *http.Response) bool {
 }
 
 func errorMaker(err error) string {
-	str := "Error during Dial Broadcasting " + err.Error()
-	return str
+	return "Error during Dial Broadcasting " + err.Error()
 }
