@@ -5,6 +5,8 @@ import (
 	"log-b/internal/cache"
 	"log-b/internal/db"
 	"flag"
+	"net"
+	"log"
 )
 
 type StartUp struct {
@@ -38,6 +40,14 @@ func startServer(node server.Replica) {
 func main() {
 	inMemoryMap := cache.Bcache{}
 	diskStorage := db.NewDB()
+	defer func() {
+		if r := recover(); r != nil {
+			log.Fatal(r)
+		}
+	}()
+	if !conf.seed {
+		cluster.RegisterToSeed("127.0.0.1:6767", net.JoinHostPort(conf.address, conf.listenPort))
+	}
 	node := server.NewLoggedServer(conf.address, conf.listenPort, inMemoryMap, diskStorage)
 	startServer(node)
 }
