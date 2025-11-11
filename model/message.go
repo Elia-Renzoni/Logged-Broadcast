@@ -30,3 +30,7 @@ type MessageContent struct {
 	Key string
 	Value string
 }
+
+type BasicJoinMessage struct {
+	NodeCompleteAddress string
+}
