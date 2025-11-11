@@ -38,7 +38,7 @@ func RegisterToSeed(seedAddress, personalAddress string) {
 
 EXP_BACKOFF:
 	for {
-		time.Sleep(timeSleeping * time.Millisecond)
+		time.Sleep(time.Duration(timeSleeping) * time.Millisecond)
 		res, connErr = client.Do(req)
 		if nErr, ok := connErr.(net.Error); ok {
 			if nErr.Timeout() {
