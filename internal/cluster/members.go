@@ -32,12 +32,14 @@ func RemoveMember(addr string) error {
 	}
 
 	for index := range pGroup {
-		pGroup = slices.Delete(pGroup, index, index + 1)
+		pGroup = slices.Delete(pGroup, index, index)
 	}
 
 	return nil
 }
 
 func GetFullMembershipList() []string  {
+	lock.Lock()
+	defer lock.Unlock()
 	return pGroup
 }
