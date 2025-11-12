@@ -47,8 +47,8 @@ func (l *LogDB) WriteMessage(content model.PersistentMessage, opType uint8) erro
 		return errors.New("Write Operations Aborted Before Completion")
 	}
 
-	fResult, fErr := l.instance.ExecContext(l.dbCtx, INSERT_SENDER, senderInfo.Addr, senderInfo.Port)
-	sResult, sErr := l.instance.ExecContext(l.dbCtx, INSERT_MESSAGE, messageContent.Endpoint, messageContent.Key, messageContent.Value)
+	fResult, fErr := l.instance.ExecContext(l.dbCtx, insertSenderStmt, senderInfo.Addr, senderInfo.Port)
+	sResult, sErr := l.instance.ExecContext(l.dbCtx, insertMessageStmt, messageContent.Endpoint, messageContent.Key, messageContent.Value)
 
 	if fErr != nil || sErr != nil {
 		return errors.New("Impossible to Operate INSERT statements")
@@ -57,7 +57,7 @@ func (l *LogDB) WriteMessage(content model.PersistentMessage, opType uint8) erro
 	fId, _ := fResult.LastInsertId()
 	sId, _ := sResult.LastInsertId()
 
-	_, err := l.instance.ExecContext(l.dbCtx, INSERT_BUFFER, opType, fId, sId)
+	_, err := l.instance.ExecContext(l.dbCtx, insertBufferStmt, opType, fId, sId)
 	if err != nil {
 		return errors.New("Impossible to Operate final INSERT statements")
 	}
@@ -73,9 +73,9 @@ func (l *LogDB) DeleteMessage(searchKey string) error {
 	var err error
 	l.tx, err = l.instance.BeginTx(l.dbCtx, nil)
 
-	result, err := tx.ExecContext(l.dbCtx, DELETE_MESSAGE, searchKey)
+	result, err := l.tx.ExecContext(l.dbCtx, deleteMessageStmt, searchKey)
 	if err != nil {
-		return errors.New("Some Errors Occured When Tried to Perform a Delete Message Operation " + err)
+		return errors.New("Some Errors Occured When Tried to Perform a Delete Message Operation " + err.Error())
 	}
 
 	if result == nil {
@@ -86,7 +86,7 @@ func (l *LogDB) DeleteMessage(searchKey string) error {
 	// the sender infos
 	result := l.getMessageID(searchKey)
 	if result == -1 {
-		tx.Rollback()
+		l.tx.Rollback()
 	}
 
 	return nil

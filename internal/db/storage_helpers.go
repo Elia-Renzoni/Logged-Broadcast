@@ -19,17 +19,17 @@ func (l *LogDB) setDBInternals() error {
 		err error
 	)
 
-	result, err = l.instance.ExecContext(l.dbCtx, CREATE_DB, nil)
+	result, err = l.instance.ExecContext(l.dbCtx, createDB, nil)
 	if err != nil || result == nil {
 		return err
 	}
 
-	result, err = l.instance.ExecContext(l.dbCtx, CREATE_TABLE_MESSAGE, nil)
+	result, err = l.instance.ExecContext(l.dbCtx, createTableMessage, nil)
 	if err != nil || result == nil {
 		return err
 	}
 
-	result, err = l.instance.ExecContext(l.dbCtx, CREATE_TABLE_SENDER, nil)
+	result, err = l.instance.ExecContext(l.dbCtx, createTableSender, nil)
 	if err != nil || result == nil {
 		return err
 	}
@@ -47,7 +47,7 @@ func (l *LogDB) deleteFromBuffer() {
 func (l *LogDB) getMessageID(messageKey string) int {
 	var messageId int
 
-	rows, err := l.tx.QueryContext(l.dbCtx, FETCH_MESSAGE_ID, messageKey)
+	rows, err := l.tx.QueryContext(l.dbCtx, fetchMessageIDStmt, messageKey)
 	if err != nil {
 		return -1
 	}
