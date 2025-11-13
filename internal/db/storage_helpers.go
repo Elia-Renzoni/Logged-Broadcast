@@ -4,9 +4,6 @@ import (
 	"database/sql"
 )
 
-func (l *LogDB) getMessageId() {
-
-}
 
 func (l *LogDB) getSenderId() int {
 	return 0
@@ -45,13 +42,13 @@ func (l *LogDB) deleteFromBuffer() {
 }
 
 func (l *LogDB) getMessageID(messageKey string) int {
-	var messageId int
-
 	rows, err := l.tx.QueryContext(l.dbCtx, fetchMessageIDStmt, messageKey)
 	if err != nil {
 		return -1
 	}
 
+	
+	var messageId int
 	for rows.Next() {
 		if err := rows.Scan(&messageId); err != nil {
 			return -1
@@ -63,5 +60,5 @@ func (l *LogDB) getMessageID(messageKey string) int {
 		return -1
 	}
 
-	return 0
+	return messageId
 }

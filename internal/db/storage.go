@@ -41,7 +41,7 @@ func (l *LogDB) WriteMessage(content model.PersistentMessage, opType uint8) erro
 		messageContent = content.Cinfo
 	)
 
-	fCheck, sCheck := emptynessChecker(senderInfo), emptynessChecker(messageContent)
+	fCheck, sCheck := isEmpty(senderInfo), isEmpty(messageContent)
 
 	if !((fCheck || sCheck) && !l.faultyStatus.Load()) {
 		return errors.New("Write Operations Aborted Before Completion")
@@ -82,10 +82,7 @@ func (l *LogDB) DeleteMessage(searchKey string) error {
 		return errors.New("Some Errors Occured When Tried to Peform a Delete Message Operation")
 	}
 
-	// if the message is now properly deleted the server can delete
-	// the sender infos
-	result := l.getMessageID(searchKey)
-	if result == -1 {
+	if msgId := l.getMessageID(searchKey); msgId == -1 {
 		l.tx.Rollback()
 	}
 
@@ -137,7 +134,7 @@ func (l *LogDB) pinger() {
 	}
 }
 
-func emptynessChecker(msg any) bool {
+func isEmpty(msg any) bool {
 	var ok bool 
 
 	switch value := msg.(type) {
