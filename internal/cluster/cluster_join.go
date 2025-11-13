@@ -7,10 +7,11 @@ import (
 	"bytes"
 	"io"
 	"time"
-	"net"
 	"errors"
 	"net/url"
-	"strconv"
+	"context"
+	"net"
+	"fmt"
 )
 
 const (
@@ -20,13 +21,9 @@ const (
 
 func RegisterToSeed(seedAddress, personalAddress string) {
 	var (
-		client   = http.Client{
-			Timeout: 3 * time.Second,
-		}
-		msg      = model.BasicJoinMessage{
+		msg = model.BasicJoinMessage{
 			NodeCompleteAddress: personalAddress,
 		}
-		req, err = prepareRegistrationRequest(seedAddress, msg) 
 		res *http.Response
 		connErr error
 		timeSleeping = 500
@@ -34,29 +31,30 @@ func RegisterToSeed(seedAddress, personalAddress string) {
 		exitStatus bool
 	)
 
-	if err != nil {
-		panic(err)
-	}
-
 EXP_BACKOFF:
 	for {
 		time.Sleep(time.Duration(timeSleeping) * time.Millisecond)
+		client := http.Client{Timeout: 3 * time.Second}
+		req, err := prepareRegistrationRequest(seedAddress, msg)
+		if err != nil {
+			panic(err)
+		}
 		res, connErr = client.Do(req)
-		if nErr, ok := connErr.(net.Error); ok {
-			if nErr.Timeout() {
-				timeSleeping += backoffDeltaFactor
-				if retries >= backoffMaxRetries {
-					exitStatus = false
-					break EXP_BACKOFF
-				}
-				retries += 1
-				continue 
+		if errors.Is(connErr, context.DeadlineExceeded) || isNetError(connErr) {
+			timeSleeping += backoffDeltaFactor
+			if retries >= backoffMaxRetries - 1 {
+				exitStatus = false
+				break EXP_BACKOFF
 			}
+			retries += 1
+			continue
+		
 		} else {
 			if connErr != nil {
 				exitStatus = false
 				break EXP_BACKOFF
 			}
+		
 		}
 
 		// if the loop exit with a true the code below
@@ -66,7 +64,8 @@ EXP_BACKOFF:
 	}
 
 	if !exitStatus {
-		panic(errors.New("Registration Failed within retries: " + strconv.Itoa(retries)))
+		message := fmt.Sprintf("Registration Failed due to %s within %d retries", connErr.Error(), retries)
+		panic(message)
 	}
 
 	if res.StatusCode != 200 {
@@ -98,4 +97,13 @@ func generateFullHttpEndpoint(seedAddress string) string {
 		panic(err)
 	}
 	return joinedURL
+}
+
+func isNetError(err error) bool {
+	netErr, ok := err.(net.Error)
+	if !ok {
+		return false
+	}
+
+	return netErr.Timeout()
 }

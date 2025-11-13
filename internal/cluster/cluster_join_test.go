@@ -6,6 +6,8 @@ import (
 	"log-b/internal/cluster"
 	"sync"
 	"net/http"
+	"fmt"
+	"time"
 )
 
 const mockSeedAddress string = "127.0.0.1:5006"
@@ -23,22 +25,28 @@ func startMockSeed() {
 
 func handleConn(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
-	defer mu.Unlock()
 
 	backoffRetry += 1
+	mu.Unlock()
+	time.Sleep(4 * time.Second)
 }
 
 func TestRegisterToSeed(t *testing.T) {
 	go startMockSeed()
-	cluster.RegisterToSeed(mockSeedAddress, "my-address")
+	time.Sleep(1 * time.Second)
 
-	defer func() {
-		if r := recover(); r != nil {
-			mu.Lock()
-			if backoffRetry != backOffMaxRetries {
-				t.Fail()
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				fmt.Println(r)
 			}
-			mu.Unlock()
-		}
+		}()
+
+		cluster.RegisterToSeed(mockSeedAddress, "my-address")
 	}()
+	mu.Lock()
+	if backoffRetry != backOffMaxRetries {
+		t.Fail()
+	}
+	mu.Unlock()
 }
