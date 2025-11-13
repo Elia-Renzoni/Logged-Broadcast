@@ -9,6 +9,7 @@ import (
 	"time"
 	"net"
 	"errors"
+	"net/url"
 )
 
 const (
@@ -79,12 +80,16 @@ func prepareRegistrationRequest(seedAddress string, msg model.BasicJoinMessage) 
 	}
 
 	return http.NewRequest(
+		http.MethodPost,
 		generateFullHttpEndpoint(seedAddress), 
-		http.MethodPost, 
 		bytes.NewReader(data),
 	)
 }
 
 func generateFullHttpEndpoint(seedAddress string) string {
-	return seedAddress + "/add-node"
+	joinedURL, err := url.JoinPath("http://" + seedAddress, "/add-node")
+	if err != nil {
+		panic(err)
+	}
+	return joinedURL
 }
