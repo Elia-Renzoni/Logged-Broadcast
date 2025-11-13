@@ -78,5 +78,13 @@ func prepareRegistrationRequest(seedAddress string, msg model.BasicJoinMessage) 
 		panic(err)
 	}
 
-	return http.NewRequest(seedAddress, http.MethodPost, bytes.NewReader(data))
+	return http.NewRequest(
+		generateFullHttpEndpoint(seedAddress), 
+		http.MethodPost, 
+		bytes.NewReader(data),
+	)
+}
+
+func generateFullHttpEndpoint(seedAddress string) string {
+	return seedAddress + "/add-node"
 }
