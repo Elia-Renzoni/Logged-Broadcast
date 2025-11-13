@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS Sender (
  senderPort INTEGER NOT NULL,
  PRIMARY KEY(senderID)
 );
-                               `
+`
+
 var createTableMessage string = `
 CREATE TABLE IF NOT EXISTS Message (
  messageID INTEGER,
@@ -19,7 +20,8 @@ CREATE TABLE IF NOT EXISTS Message (
  messageValue TEXT NOT NULL,
  PRIMARY KEY(messageID)
 );
-				`
+`
+
 var createTableBuffer string = `
 CREATE TABLE IF NOT EXISTS Buffer (
  logID INTEGER,
@@ -30,25 +32,31 @@ CREATE TABLE IF NOT EXISTS Buffer (
  FOREIGN KEY(senderID) REFERENCES Sender(senderID),
  FOREIGN KEY(messageID) REFERENCES Message(messageID)
 );
-                               `
+`
+
 var insertBufferStmt string = `
-                                 INSERT INTO Buffer (logState, senderID, messageID) VALUES (?, ?, ?);
-			      `
+INSERT INTO Buffer (logState, senderID, messageID) VALUES (?, ?, ?);
+`
+
 var insertSenderStmt string = `
-  				 INSERT INTO Sender (senderAddr, senderPort) VALUES (?, ?);
-                              `
+INSERT INTO Sender (senderAddr, senderPort) VALUES (?, ?);
+`
+
 var insertMessageStmt string = `
-				 INSERT INTO Message (messageEndpoint, messageKey, messageValue)
-				 VALUES (?, ?, ?);
-			      `
+INSERT INTO Message (messageEndpoint, messageKey, messageValue)
+VALUES (?, ?, ?);
+`
+
 var deleteMessageStmt string = `
- 				 DELETE FROM Message
-				 WHERE messageKey = ?;
-			       `
+DELETE FROM Message
+WHERE messageKey = ?;
+`
+
 var deleteSenderStmt string = `
-				DELETE FROM Sender
-				WHERE senderID = ?;
-			      `
+DELETE FROM Sender
+WHERE senderID = ?;
+`
+
 var fetchMessageIDStmt string = `
 SELECT Message.messageID
 FROM Message
