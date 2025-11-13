@@ -1,10 +1,10 @@
 package db
 
 var createDB string = `
-                        CREATE DB loggerb;
-		      `
+CREATE DB logger
+`
 var createTableSender string = `
-                                 CREATE TABLE IF NOT EXISTS Sender (
+                                CREATE TABLE IF NOT EXISTS Sender (
                                     senderID INTEGER,
 				    senderAddr TEXT NOT NULL,
 				    senderPort INTEGER NOT NULL,
