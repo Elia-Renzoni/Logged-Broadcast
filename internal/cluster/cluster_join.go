@@ -64,8 +64,7 @@ EXP_BACKOFF:
 	}
 
 	if !exitStatus {
-		message := fmt.Sprintf("Registration Failed due to %s within %d retries", connErr.Error(), retries)
-		panic(message)
+		panic(fmt.Sprintf("Registration Failed due to %s within %d retries", connErr, retries))
 	}
 
 	if res.StatusCode != 200 {
