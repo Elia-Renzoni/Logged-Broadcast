@@ -74,10 +74,10 @@ func send(addr string, msg []byte, methodRouter string) (bool, error) {
 		return false, errors.New(errorMaker(err))
 	}
 
-	return ackProcessing(res), nil
+	return evaluateAck(res), nil
 }
 
-func ackProcessing(res *http.Response) bool {
+func evaluateAck(res *http.Response) bool {
 	return res.StatusCode == 201 || res.StatusCode == 200
 }
 
