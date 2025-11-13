@@ -27,12 +27,10 @@ type LogDB struct {
 }
 
 func NewDB() *LogDB {
-	l := &LogDB{
+	return &LogDB{
 		pingerTime: 3 * time.Second,
 		dbCtx: context.Background(),
 	}
-	
-	return l
 }
 
 func (l *LogDB) WriteMessage(content model.PersistentMessage, opType uint8) error {
