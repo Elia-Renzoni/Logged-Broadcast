@@ -32,7 +32,12 @@ func RemoveMember(addr string) error {
 	}
 
 	for index := range pGroup {
-		pGroup = slices.Delete(pGroup, index, index)
+		if pGroup[index] == addr {
+			if index < len(pGroup) {
+				pGroup = slices.Delete(pGroup, index, index + 1)
+				break
+			}
+		}
 	}
 
 	return nil

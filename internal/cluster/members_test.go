@@ -31,4 +31,18 @@ func TestRemoveMember(t *testing.T) {
 	if ok {
 		t.Fail()
 	}
+
+
+	cluster.AddMember("127.0.0.1:2222")
+	cluster.AddMember("127.0.0.1:5555")
+
+	if err := cluster.RemoveMember("127.0.0.1:5555"); err != nil {
+		t.Fatalf("%s", err.Error())
+	}
+
+	var finalList = cluster.GetFullMembershipList()
+	result := slices.Contains(finalList, "127.0.0.1:5555")
+	if result {
+		t.Fail()
+	}
 }
