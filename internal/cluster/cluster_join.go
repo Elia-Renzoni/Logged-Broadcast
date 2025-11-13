@@ -10,6 +10,7 @@ import (
 	"net"
 	"errors"
 	"net/url"
+	"strconv"
 )
 
 const (
@@ -49,8 +50,11 @@ EXP_BACKOFF:
 					break EXP_BACKOFF
 				}
 				retries += 1
-				continue
+				continue 
 			}
+		} else {
+			exitStatus = false
+			break EXP_BACKOFF
 		}
 
 		// if the loop exit with a true the code below
@@ -60,7 +64,7 @@ EXP_BACKOFF:
 	}
 
 	if !exitStatus {
-		panic(errors.New("Registration Failed"))
+		panic(errors.New("Registration Failed within retries: " + strconv.Itoa(retries)))
 	}
 
 	if res.StatusCode != 200 {
