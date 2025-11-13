@@ -31,7 +31,7 @@ func handleConn(w http.ResponseWriter, r *http.Request) {
 	time.Sleep(4 * time.Second)
 }
 
-func TestRegisterToSeed(t *testing.T) {
+func TestRegisterToSeedWithFailures(t *testing.T) {
 	go startMockSeed()
 	time.Sleep(1 * time.Second)
 
