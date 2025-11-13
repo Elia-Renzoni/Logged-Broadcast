@@ -55,7 +55,7 @@ func send(addr string, msg []byte, methodRouter string) (bool, error) {
 	case ADD_NODE, SET_DATA:
 		req, err = http.NewRequestWithContext(ctx, http.MethodPost, addr, bytes.NewBuffer(msg))
 		if err != nil {
-			return false, errors.New(errorMaker(err))
+			return false, errors.New(makeError(err))
 		}
 		req.Header.Set("Content-Type", header)
 		res, err = client.Do(req)
@@ -63,7 +63,7 @@ func send(addr string, msg []byte, methodRouter string) (bool, error) {
 	case DELETE_DATA:
 		req, err = http.NewRequestWithContext(ctx, http.MethodDelete, addr, nil)
 		if err != nil {
-			return false, errors.New(errorMaker(err))
+			return false, errors.New(makeError(err))
 		}
 
 		req.Header.Set("Content-Type", header)
@@ -71,7 +71,7 @@ func send(addr string, msg []byte, methodRouter string) (bool, error) {
 	}
 
 	if err != nil {
-		return false, errors.New(errorMaker(err))
+		return false, errors.New(makeError(err))
 	}
 
 	return evaluateAck(res), nil
@@ -81,6 +81,6 @@ func evaluateAck(res *http.Response) bool {
 	return res.StatusCode == 201 || res.StatusCode == 200
 }
 
-func errorMaker(err error) string {
+func makeError(err error) string {
 	return "Error during Dial Broadcasting " + err.Error()
 }
