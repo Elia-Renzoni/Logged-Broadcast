@@ -53,8 +53,10 @@ EXP_BACKOFF:
 				continue 
 			}
 		} else {
-			exitStatus = false
-			break EXP_BACKOFF
+			if connErr != nil {
+				exitStatus = false
+				break EXP_BACKOFF
+			}
 		}
 
 		// if the loop exit with a true the code below
