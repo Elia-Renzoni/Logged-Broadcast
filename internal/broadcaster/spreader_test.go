@@ -41,5 +41,5 @@ func startServers() {
 }
 
 func handleMessage(w http.ResponseWriter, r *http.Request) {
-	// TODO -> write header and basic text-encoded body message
+	w.WriteHeader(http.StatusOK)
 }
