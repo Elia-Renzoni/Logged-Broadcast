@@ -23,7 +23,7 @@ func DoBroadcast(message []byte, methodRouter string, addrWithEndpoints string) 
 	do := func() bool {
 		var c ackCounter
 		for _, node := range memberlist {
-			endsystem := node + addrWithEndpoints
+			endsystem := "http://" + node + addrWithEndpoints
 			eval, err := send(endsystem, message, methodRouter)
 			if err != nil {
 				log.Fatal(err.Error())
@@ -45,7 +45,7 @@ func send(addr string, msg []byte, methodRouter string) (bool, error) {
 		res    *http.Response
 		req    *http.Request
 		err    error
-		client = http.Client{}
+		client = http.Client{Timeout: 5 * time.Second}
 	)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
