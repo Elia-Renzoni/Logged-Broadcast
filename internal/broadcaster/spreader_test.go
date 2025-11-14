@@ -6,6 +6,7 @@ import (
 	"log-b/internal/cluster"
 	"log-b/internal/broadcaster"
 	"net/http"
+	"time"
 )
 
 
@@ -19,6 +20,7 @@ func formCluster() {
 func TestDoBroadcast(t *testing.T) {
 	formCluster()
 	go startServers()
+	time.Sleep(1 * time.Second)
 	result := broadcaster.DoBroadcast([]byte("mockbytes"), broadcaster.SET_DATA, "/addbk")
 	
 	// fail the test if the majority quorum is 
