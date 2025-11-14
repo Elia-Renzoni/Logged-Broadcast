@@ -14,6 +14,7 @@ type Storage interface {
 	WriteMessage(content model.PersistentMessage, opType uint8) error
 	RetrieveMessage()
 	DeleteMessage(searchKey string) error
+	ChangeStatus()
 	ShutdownDB()
 }
 

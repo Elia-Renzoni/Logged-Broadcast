@@ -72,8 +72,15 @@ func setKVBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.Han
 			}
 
 			dbErr := buffer.WriteMessage(model.PersistentMessage{
-				Sinfo: model.Sender{Addr: r.RemoteAddr, Port: "undefined"},
-				Cinfo: model.MessageContent{Endpoint: SET_DATA, Key: msg.Key, Value: msg.Value},
+				Sinfo: model.Sender{
+					Addr: r.RemoteAddr, 
+					Port: "undefined",
+				},
+				Cinfo: model.MessageContent{
+					Endpoint: SET_DATA, 
+					Key: msg.Key,
+					Value: msg.Value,
+				},
 			}, 0)
 			if dbErr != nil {
 				nack(w, dbErr)
@@ -86,7 +93,7 @@ func setKVBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.Han
 			// if the majority quorum is reached
 			// change the status to DELIVERED
 			if majorityReached {
-				// TODO -> change status
+				
 			}
 		},
 	)
@@ -105,6 +112,7 @@ func removeKvBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.
 			majorityReached := broadcaster.DoBroadcast(nil, DELETE_DATA, DELETE_BUCKET)
 			if majorityReached {
 				// delete from persistent storage...
+				buffer.DeleteMessage()
 			}
 			ack(w, []byte("Bucket Succesfully Removed!"))
 		},
