@@ -7,6 +7,7 @@ import (
 	"sync/atomic"
 	"errors"
 	"context"
+	"slices"
 )
 
 type Storage interface {
@@ -147,11 +148,5 @@ func isEmpty(msg any) bool {
 }
 
 func check(content ...string) bool {
-	for _, c := range content {
-		if c == "" {
-			return false
-		}
-	}
-
-	return true
+	return slices.Contains(content, "")
 }
