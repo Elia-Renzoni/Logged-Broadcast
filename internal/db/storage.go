@@ -116,6 +116,10 @@ func (l *LogDB) RetrieveMessage() {
 
 }
 
+func (l *LogDB) ChangeStatus() {
+
+}
+
 func (l *LogDB) pinger() {
 	l.tick = time.NewTicker(l.pingerTime)
 	defer l.tick.Stop()

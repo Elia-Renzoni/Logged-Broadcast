@@ -31,3 +31,8 @@ func TestRetrieveMessage(t *testing.T) {
 func TestDBFaultRecovery(t *testing.T) {
 
 }
+
+// TODO
+func TestChangeStatus(t *testing.T) {
+
+}
