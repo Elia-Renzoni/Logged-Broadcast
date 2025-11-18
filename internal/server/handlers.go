@@ -103,16 +103,16 @@ func removeKvBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			splitted := strings.Split(r.URL.Path, "/")
-			param := splitted[2]
+			key := splitted[2]
 			
-			if err := volatileBucketer.DeleteBucket(param); err != nil {
+			if err := volatileBucketer.DeleteBucket(key); err != nil {
 				nack(w, err)
 				return
 			}
 			majorityReached := broadcaster.DoBroadcast(nil, DELETE_DATA, DELETE_BUCKET)
 			if majorityReached {
 				// delete from persistent storage...
-				buffer.DeleteMessage()
+				buffer.DeleteMessage(key)
 			}
 			ack(w, []byte("Bucket Succesfully Removed!"))
 		},

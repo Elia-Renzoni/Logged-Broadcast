@@ -30,13 +30,20 @@ func TestWriteMessage(t *testing.T) {
 	}
 }
 
-/*
-// TODO
 func TestDeleteMessage(t *testing.T) {
 	instance := db.NewDB()
-	instance.DeleteMessage()
+	err := instance.StartDB()
+	defer instance.ShutdownDB()
+	if err != nil {
+		t.Fatalf("%s", err.Error())
+	}
+	dErr := instance.DeleteMessage("foo")
+	if dErr != nil {
+		t.Fatalf("%s", dErr.Error())
+	}
 }
 
+/*
 // TODO
 func TestDBFaultRecovery(t *testing.T) {
 
