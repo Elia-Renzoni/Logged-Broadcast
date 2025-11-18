@@ -25,7 +25,10 @@ func TestWriteMessage(t *testing.T) {
 			Value:    "bar",
 		},
 	}
-	instance.WriteMessage(msg, 0)
+	wErr := instance.WriteMessage(msg, 0)
+	if wErr != nil {
+		t.Fatalf("%s", wErr.Error())
+	}
 }
 
 // TODO
