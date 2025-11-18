@@ -13,7 +13,6 @@ import (
 type Storage interface {
 	StartDB() error
 	WriteMessage(content model.PersistentMessage, opType uint8) error
-	RetrieveMessage()
 	DeleteMessage(searchKey string) error
 	ChangeStatus()
 	ShutdownDB()
@@ -111,12 +110,7 @@ func (l *LogDB) ShutdownDB() {
 	l.instance.Close()
 }
 
-// only for the recovery session
-func (l *LogDB) RetrieveMessage() {
-
-}
-
-func (l *LogDB) ChangeStatus() {
+func (l *LogDB) ChangeStatus(searchKey string) {
 
 }
 
