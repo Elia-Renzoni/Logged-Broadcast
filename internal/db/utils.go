@@ -1,9 +1,5 @@
 package db
 
-var createDB string = 
-`
-CREATE DB logger
-`
 var createTableSender string = 
 `
 CREATE TABLE IF NOT EXISTS Sender (

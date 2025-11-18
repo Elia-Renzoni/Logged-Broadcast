@@ -8,6 +8,7 @@ import (
 	"errors"
 	"context"
 	"slices"
+	_ "github.com/glebarez/go-sqlite"
 )
 
 type Storage interface {
@@ -42,7 +43,7 @@ func (l *LogDB) WriteMessage(content model.PersistentMessage, opType uint8) erro
 
 	fCheck, sCheck := isEmpty(senderInfo), isEmpty(messageContent)
 
-	if !((fCheck || sCheck) && !l.faultyStatus.Load()) {
+	if (fCheck || sCheck) || l.faultyStatus.Load() {
 		return errors.New("Write Operations Aborted Before Completion")
 	}
 
@@ -58,7 +59,7 @@ func (l *LogDB) WriteMessage(content model.PersistentMessage, opType uint8) erro
 
 	_, err := l.instance.ExecContext(l.dbCtx, insertBufferStmt, opType, fId, sId)
 	if err != nil {
-		return errors.New("Impossible to Operate final INSERT statements")
+		return errors.New("Impossible to Operate final INSERT statements: " + err.Error())
 	}
 
 	return nil

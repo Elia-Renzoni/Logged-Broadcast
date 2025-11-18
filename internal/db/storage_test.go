@@ -1,6 +1,5 @@
 package db_test
 
-
 import (
 	"testing"
 	"log-b/internal/db"
@@ -31,6 +30,7 @@ func TestWriteMessage(t *testing.T) {
 	}
 }
 
+/*
 // TODO
 func TestDeleteMessage(t *testing.T) {
 	instance := db.NewDB()
@@ -45,4 +45,4 @@ func TestDBFaultRecovery(t *testing.T) {
 // TODO
 func TestChangeStatus(t *testing.T) {
 
-}
+}*/

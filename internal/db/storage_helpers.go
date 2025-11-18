@@ -16,11 +16,6 @@ func (l *LogDB) setDBInternals() error {
 		err error
 	)
 
-	result, err = l.instance.ExecContext(l.dbCtx, createDB, nil)
-	if err != nil || result == nil {
-		return err
-	}
-
 	result, err = l.instance.ExecContext(l.dbCtx, createTableMessage, nil)
 	if err != nil || result == nil {
 		return err
@@ -28,6 +23,11 @@ func (l *LogDB) setDBInternals() error {
 
 	result, err = l.instance.ExecContext(l.dbCtx, createTableSender, nil)
 	if err != nil || result == nil {
+		return err
+	}
+
+	result, err = l.instance.ExecContext(l.dbCtx, createTableBuffer, nil)
+	if err != nil {
 		return err
 	}
 
