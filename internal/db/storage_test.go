@@ -43,13 +43,7 @@ func TestDeleteMessage(t *testing.T) {
 	}
 }
 
-/*
-// TODO
-func TestDBFaultRecovery(t *testing.T) {
 
-}
-
-// TODO
 func TestChangeStatus(t *testing.T) {
 
-}*/
+}

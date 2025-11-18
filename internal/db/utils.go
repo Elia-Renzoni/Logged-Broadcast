@@ -69,6 +69,13 @@ FROM Message
 WHERE Message.messageKey = ?;
 `
 
+var fetchSenderIDStmt string =
+`
+SELECT Buffer.senderID
+FROM Buffer
+WHERE Buffer.messageID = ?;
+`
+
 var deleteEntriesFromBufferStmt string = 
 `
 DELETE FROM Buffer

@@ -70,8 +70,29 @@ func (l *LogDB) DeleteMessage(searchKey string) error {
 		return errors.New("Delete Message Operation Aborted due to empty search key")
 	}
 
-	var err error
+	if l.faultyStatus.Load() {
+		return errors.New("Unable to execute the operation due to a faulty database")
+	}
+
+	var (
+		err error
+		msgId, senderId int
+	)
+
 	l.tx, err = l.instance.BeginTx(l.dbCtx, nil)
+	defer l.tx.Rollback()
+
+	if msgId = l.getMessageID(searchKey); msgId == -1 {
+		return errors.New("Unable to find the stored message")
+	}
+
+	if senderId = l.getSenderId(msgId); senderId == -1 {
+		return errors.New("Unable to find the stored message")
+	}
+
+	if dErr := l.deleteSender(senderId); dErr != nil {
+		return dErr
+	}
 
 	result, err := l.tx.ExecContext(l.dbCtx, deleteMessageStmt, searchKey)
 	if err != nil {
@@ -82,8 +103,8 @@ func (l *LogDB) DeleteMessage(searchKey string) error {
 		return errors.New("Some Errors Occured When Tried to Peform a Delete Message Operation")
 	}
 
-	if msgId := l.getMessageID(searchKey); msgId == -1 {
-		l.tx.Rollback()
+	if err := l.deleteFromBuffer(senderId, msgId); err != nil {
+		return err
 	}
 
 	return nil
