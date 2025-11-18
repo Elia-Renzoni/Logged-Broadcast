@@ -1,9 +1,11 @@
 package db
 
-var createDB string = `
+var createDB string = 
+`
 CREATE DB logger
 `
-var createTableSender string = `
+var createTableSender string = 
+`
 CREATE TABLE IF NOT EXISTS Sender (
  senderID INTEGER,
  senderAddr TEXT NOT NULL,
@@ -12,7 +14,8 @@ CREATE TABLE IF NOT EXISTS Sender (
 );
 `
 
-var createTableMessage string = `
+var createTableMessage string = 
+`
 CREATE TABLE IF NOT EXISTS Message (
  messageID INTEGER,
  messageEndpoint TEXT NOT NULL,
@@ -22,7 +25,8 @@ CREATE TABLE IF NOT EXISTS Message (
 );
 `
 
-var createTableBuffer string = `
+var createTableBuffer string = 
+`
 CREATE TABLE IF NOT EXISTS Buffer (
  logID INTEGER,
  logState INTEGER NOT NULL,
@@ -34,36 +38,43 @@ CREATE TABLE IF NOT EXISTS Buffer (
 );
 `
 
-var insertBufferStmt string = `
+var insertBufferStmt string = 
+`
 INSERT INTO Buffer (logState, senderID, messageID) VALUES (?, ?, ?);
 `
 
-var insertSenderStmt string = `
+var insertSenderStmt string = 
+`
 INSERT INTO Sender (senderAddr, senderPort) VALUES (?, ?);
 `
 
-var insertMessageStmt string = `
+var insertMessageStmt string = 
+`
 INSERT INTO Message (messageEndpoint, messageKey, messageValue)
 VALUES (?, ?, ?);
 `
 
-var deleteMessageStmt string = `
+var deleteMessageStmt string = 
+`
 DELETE FROM Message
 WHERE messageKey = ?;
 `
 
-var deleteSenderStmt string = `
+var deleteSenderStmt string = 
+`
 DELETE FROM Sender
 WHERE senderID = ?;
 `
 
-var fetchMessageIDStmt string = `
+var fetchMessageIDStmt string = 
+`
 SELECT Message.messageID
 FROM Message
 WHERE Message.messageKey = ?;
 `
 
-var deleteEntriesFromBufferStmt string = `
+var deleteEntriesFromBufferStmt string = 
+`
 DELETE FROM Buffer
 WHERE messageID = ? AND senderID = ?;
 `
