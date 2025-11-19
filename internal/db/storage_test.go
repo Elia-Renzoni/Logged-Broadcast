@@ -9,10 +9,11 @@ import (
 func TestWriteMessage(t *testing.T) {
 	instance := db.NewDB()
 	err := instance.StartDB()
-	defer instance.ShutdownDB()
 	if err != nil {
 		t.Fatalf("%s", err.Error())
 	}
+	defer instance.ShutdownDB()
+
 	msg := model.PersistentMessage{
 		Sinfo: model.Sender{
 			Addr: "127.0.0.1",
@@ -33,10 +34,11 @@ func TestWriteMessage(t *testing.T) {
 func TestDeleteMessage(t *testing.T) {
 	instance := db.NewDB()
 	err := instance.StartDB()
-	defer instance.ShutdownDB()
 	if err != nil {
 		t.Fatalf("%s", err.Error())
 	}
+	defer instance.ShutdownDB()
+
 	dErr := instance.DeleteMessage("foo")
 	if dErr != nil {
 		t.Fatalf("%s", dErr.Error())
@@ -45,5 +47,16 @@ func TestDeleteMessage(t *testing.T) {
 
 
 func TestChangeStatus(t *testing.T) {
+	instance := db.NewDB()
+	err := instance.StartDB()
+	if err != nil {
+		t.Fatalf("%s", err.Error())
+	}
 
+	defer instance.ShutdownDB()
+
+	cErr := instance.ChangeStatus("foo")
+	if cErr != nil {
+		t.Fatalf("%s", cErr.Error())
+	}
 }
