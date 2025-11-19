@@ -81,3 +81,10 @@ var deleteEntriesFromBufferStmt string =
 DELETE FROM Buffer
 WHERE messageID = ? AND senderID = ?;
 `
+
+var changeStatusToDelivered string = 
+`
+UPDATE Buffer
+SET logState = 1
+WHERE Buffer.messageID = ?;
+`

@@ -15,7 +15,7 @@ type Storage interface {
 	StartDB() error
 	WriteMessage(content model.PersistentMessage, opType uint8) error
 	DeleteMessage(searchKey string) error
-	ChangeStatus()
+	ChangeStatus(searchKey string) error
 	ShutdownDB()
 }
 
@@ -134,8 +134,44 @@ func (l *LogDB) ShutdownDB() {
 	l.instance.Close()
 }
 
-func (l *LogDB) ChangeStatus(searchKey string) {
+func (l *LogDB) ChangeStatus(searchKey string) error {
+	if searchKey == "" {
+		return errors.New("Change status operation aborted due to empty search key")
+	}
 
+	if l.faultyStatus.Load() {
+		return errors.New("Unable to execute the operation due to a faulty database")
+	}
+
+	var (
+		tx *sql.Tx
+		err error
+		msgId int
+		result sql.Result
+	)
+
+	tx, err = l.instance.Begin()
+	if err != nil {
+		return err
+	}
+
+	defer tx.Rollback()
+
+	if msgId = l.getMessageID(tx, searchKey); msgId == -1 {
+		return errors.New("Unable to find the stored message")
+	}
+
+	result, err = tx.ExecContext(l.dbCtx, changeStatusToDelivered, msgId)
+	if err != nil {
+		return err
+	}
+
+	if result == nil {
+		return errors.New("Impossible to Operate UPDATE statements")
+	}
+
+	tx.Commit()
+	return nil
 }
 
 func (l *LogDB) pinger() {
