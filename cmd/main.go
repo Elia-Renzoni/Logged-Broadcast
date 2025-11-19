@@ -4,6 +4,7 @@ import (
 	"log-b/internal/server"
 	"log-b/internal/cache"
 	"log-b/internal/db"
+	"log-b/internal/cluster"
 	"flag"
 	"net"
 	"log"
