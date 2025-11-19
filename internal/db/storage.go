@@ -25,7 +25,6 @@ type LogDB struct {
 	tick         *time.Ticker
 	faultyStatus atomic.Bool
 	dbCtx        context.Context
-	tx           *sql.Tx
 }
 
 func NewDB() *LogDB {
@@ -77,24 +76,25 @@ func (l *LogDB) DeleteMessage(searchKey string) error {
 	var (
 		err error
 		msgId, senderId int
+		tx *sql.Tx
 	)
 
-	l.tx, err = l.instance.BeginTx(l.dbCtx, nil)
-	defer l.tx.Rollback()
+	tx, err = l.instance.BeginTx(l.dbCtx, nil)
+	defer tx.Rollback()
 
-	if msgId = l.getMessageID(searchKey); msgId == -1 {
+	if msgId = l.getMessageID(tx, searchKey); msgId == -1 {
 		return errors.New("Unable to find the stored message")
 	}
 
-	if senderId = l.getSenderId(msgId); senderId == -1 {
+	if senderId = l.getSenderId(tx, msgId); senderId == -1 {
 		return errors.New("Unable to find the stored message")
 	}
 
-	if dErr := l.deleteSender(senderId); dErr != nil {
+	if dErr := l.deleteSender(tx, senderId); dErr != nil {
 		return dErr
 	}
 
-	result, err := l.tx.ExecContext(l.dbCtx, deleteMessageStmt, searchKey)
+	result, err := tx.ExecContext(l.dbCtx, deleteMessageStmt, searchKey)
 	if err != nil {
 		return errors.New("Some Errors Occured When Tried to Perform a Delete Message Operation " + err.Error())
 	}
@@ -103,9 +103,11 @@ func (l *LogDB) DeleteMessage(searchKey string) error {
 		return errors.New("Some Errors Occured When Tried to Peform a Delete Message Operation")
 	}
 
-	if err := l.deleteFromBuffer(senderId, msgId); err != nil {
+	if err := l.deleteFromBuffer(tx, senderId, msgId); err != nil {
 		return err
 	}
+
+	tx.Commit()
 
 	return nil
 }

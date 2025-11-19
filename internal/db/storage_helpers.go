@@ -5,8 +5,8 @@ import (
 	"errors"
 )
 
-func (l *LogDB) getSenderId(messageId int) int {
-	rows, err := l.tx.QueryContext(l.dbCtx, fetchSenderIDStmt, messageId)
+func (l *LogDB) getSenderId(tx *sql.Tx, messageId int) int {
+	rows, err := tx.QueryContext(l.dbCtx, fetchSenderIDStmt, messageId)
 	if err != nil {
 		return -1
 	}
@@ -50,8 +50,8 @@ func (l *LogDB) setDBInternals() error {
 	return nil
 }
 
-func (l *LogDB) deleteFromBuffer(senderID, messageID int) error {
-	result, err := l.tx.ExecContext(l.dbCtx, deleteEntriesFromBufferStmt, messageID, senderID)
+func (l *LogDB) deleteFromBuffer(tx *sql.Tx, senderID, messageID int) error {
+	result, err := tx.ExecContext(l.dbCtx, deleteEntriesFromBufferStmt, messageID, senderID)
 	if err != nil || result == nil {
 		return err
 	}
@@ -59,8 +59,8 @@ func (l *LogDB) deleteFromBuffer(senderID, messageID int) error {
 	return nil
 }
 
-func (l *LogDB) deleteSender(senderID int) error {
-	result, err := l.tx.ExecContext(l.dbCtx, deleteSenderStmt, senderID)
+func (l *LogDB) deleteSender(tx *sql.Tx, senderID int) error {
+	result, err := tx.ExecContext(l.dbCtx, deleteSenderStmt, senderID)
 	if err != nil { 
 		return err
 	}
@@ -72,8 +72,8 @@ func (l *LogDB) deleteSender(senderID int) error {
 	return nil
 }
 
-func (l *LogDB) getMessageID(messageKey string) int {
-	rows, err := l.tx.QueryContext(l.dbCtx, fetchMessageIDStmt, messageKey)
+func (l *LogDB) getMessageID(tx *sql.Tx, messageKey string) int {
+	rows, err := tx.QueryContext(l.dbCtx, fetchMessageIDStmt, messageKey)
 	if err != nil {
 		return -1
 	}
