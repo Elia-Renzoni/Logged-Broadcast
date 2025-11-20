@@ -88,15 +88,16 @@ func setKVBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.Han
 			}
 
 			majorityReached := broadcaster.DoBroadcast(body, SET_DATA, POST_SET_BUCKET)
-			
-			// if the majority quorum is reached
-			// change the status to DELIVERED
-			if majorityReached {
-				if err := buffer.ChangeStatus(msg.Key); err != nil {
-					nack(w, err)
-					return
-				}
+			if !majorityReached {
+				nack(w, errors.New("operation aborted: quorum not reached"))
+				return
 			}
+
+			if err := buffer.ChangeStatus(msg.Key); err != nil {
+				nack(w, err)
+				return
+			}
+			
 			ack(w, data)
 		},
 	)
@@ -113,12 +114,14 @@ func removeKvBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.
 				return
 			}
 			majorityReached := broadcaster.DoBroadcast(nil, DELETE_DATA, DELETE_BUCKET)
-			if majorityReached {
-				// delete from persistent storage
-				if err := buffer.DeleteMessage(key); err != nil {
-					nack(w, err)
-					return
-				}
+			if !majorityReached {
+				nack(w, errors.New("opreation aborte: quorum not reached"))
+				return
+			}
+
+			if err := buffer.DeleteMessage(key); err != nil {
+				nack(w, err)
+				return
 			}
 			ack(w, []byte("Bucket Succesfully Removed!"))
 		},
