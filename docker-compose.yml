@@ -3,19 +3,18 @@ services:
     build: .
     container_name: seed
     environment:
-      NODE_ADDR: "seed:8080"
-      SEED_ADDR: "seed:8080"
-      IS_SEED: "true"
+      host: "127.0.0.1"
+      port: "6767"
+      seed: "true"
     networks:
       - cluster_net
 
   node:
     build: .
     environment:
-      # Usa l’hostname come indirizzo:
-      NODE_ADDR: "${HOSTNAME}:8080"
-      SEED_ADDR: "seed:8080"
-      IS_SEED: "false"
+      host: "${HOSTNAME}"
+      port: "8080"
+      seed: "false"
     depends_on:
       - seed
     networks:
@@ -23,4 +22,3 @@ services:
 
 networks:
   cluster_net:
-
