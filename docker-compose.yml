@@ -9,35 +9,11 @@ services:
     networks:
       - cluster_net
 
-  node1:
+  node:
     build: .
-    container_name: node1
     environment:
-      NODE_ADDR: "node1:8080"
-      SEED_ADDR: "seed:8080"
-      IS_SEED: "false"
-    depends_on:
-      - seed
-    networks:
-      - cluster_net
-
-  node2:
-    build: .
-    container_name: node2
-    environment:
-      NODE_ADDR: "node2:8080"
-      SEED_ADDR: "seed:8080"
-      IS_SEED: "false"
-    depends_on:
-      - seed
-    networks:
-      - cluster_net
-
-  node3:
-    build: .
-    container_name: node3
-    environment:
-      NODE_ADDR: "node3:8080"
+      # Usa l’hostname come indirizzo:
+      NODE_ADDR: "${HOSTNAME}:8080"
       SEED_ADDR: "seed:8080"
       IS_SEED: "false"
     depends_on:
