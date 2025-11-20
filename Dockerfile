@@ -1,9 +1,13 @@
-# image build
-FROM golang:1.25
+FROM golang:1.25-alpine
 
 WORKDIR /cmd
 
-COPY go.mod go.sum
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
 
-CMD ['/cmd']
+COPY . .
 
+RUN go build -o cmd .
+
+CMD ["./cmd"]
