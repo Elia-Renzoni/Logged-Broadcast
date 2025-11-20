@@ -1,13 +1,19 @@
-FROM golang:1.25-alpine
+FROM golang:1.22 AS builder
+WORKDIR /app
 
-WORKDIR /cmd
-
-COPY go.mod .
-COPY go.sum .
+COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
 
-RUN go build -o cmd .
+RUN CGO_ENABLED=0 GOOS=linux go build -o node ./cmd
 
-CMD ["./cmd"]
+FROM alpine:latest
+WORKDIR /app
+
+COPY --from=builder /app/node .
+
+EXPOSE 8080
+
+ENTRYPOINT ["./node"]
+
