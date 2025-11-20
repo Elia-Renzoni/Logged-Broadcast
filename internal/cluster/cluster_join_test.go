@@ -20,7 +20,10 @@ func startMockSeed() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/add-node", handleConn)
 
-	http.ListenAndServe(mockSeedAddress, mux)
+	err := http.ListenAndServe(mockSeedAddress, mux)
+	if err != nil {
+		return
+	}
 }
 
 func handleConn(w http.ResponseWriter, r *http.Request) {

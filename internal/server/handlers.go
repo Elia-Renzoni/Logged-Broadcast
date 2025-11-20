@@ -36,8 +36,18 @@ func addNodeToCluster() http.Handler {
 				return
 			}
 
-			cluster.AddMember(msg.Node)
-			broadcaster.DoBroadcast(body, ADD_NODE, POST_ADD_NODE)
+			if err := cluster.AddMember(msg.Node); err != nil {
+				nack(w, err)
+				return
+			}
+
+			majorityReached := broadcaster.DoBroadcast(body, ADD_NODE, POST_ADD_NODE)
+			if !majorityReached {
+				nack(w, errors.New("operation aborted: quorum not reached"))
+				return
+			}
+
+			ack(w, []byte("Join Approved"))
 		},
 	)
 }

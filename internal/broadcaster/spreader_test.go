@@ -11,10 +11,15 @@ import (
 
 
 func formCluster() {
-	cluster.AddMember("127.0.0.1:8080")
-	cluster.AddMember("127.0.0.1:8081")
-	cluster.AddMember("127.0.0.1:8082")
-	cluster.AddMember("127.0.0.1:8083")
+	e1 := cluster.AddMember("127.0.0.1:8080")
+	e2 := cluster.AddMember("127.0.0.1:8081")
+	e3 := cluster.AddMember("127.0.0.1:8082")
+	e4 := cluster.AddMember("127.0.0.1:8083")
+
+	switch {
+	case e1 != nil, e2 != nil, e3 != nil, e4 != nil:
+		return
+	}
 }
 
 func TestDoBroadcast(t *testing.T) {
@@ -37,7 +42,10 @@ func startServers() {
 			mux := http.NewServeMux()
 			mux.HandleFunc("/addbk", handleMessage)
 
-			http.ListenAndServe(peer, mux)
+			err := http.ListenAndServe(peer, mux)
+			if err != nil {
+				return
+			}
 		}(node)
 	}
 }

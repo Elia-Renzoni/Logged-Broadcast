@@ -3,6 +3,7 @@ package cache
 import (
 	badger "github.com/dgraph-io/badger"
 	"bytes"
+	"log"
 )
 
 
@@ -28,7 +29,10 @@ func (b *Bcache) OpenDB() {
 }
 
 func (b *Bcache) CloseDB() {
-	b.db.Close()
+	err := b.db.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (b Bcache) SetBucket(key, value string) {
