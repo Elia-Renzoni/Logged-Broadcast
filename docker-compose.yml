@@ -1,9 +1,52 @@
-version: '3.8'
+version: "3.9"
 
 services:
-  app:
+  seed:
     build: .
-    container_name: logged_broadcast_app
-    ports:
-      - "8000:8000" 
-    restart: unless-stopped
+    container_name: seed
+    environment:
+      NODE_ADDR: "seed:8080"
+      SEED_ADDR: "seed:8080"
+      IS_SEED: "true"
+    networks:
+      - cluster_net
+
+  node1:
+    build: .
+    container_name: node1
+    environment:
+      NODE_ADDR: "node1:8080"
+      SEED_ADDR: "seed:8080"
+      IS_SEED: "false"
+    depends_on:
+      - seed
+    networks:
+      - cluster_net
+
+  node2:
+    build: .
+    container_name: node2
+    environment:
+      NODE_ADDR: "node2:8080"
+      SEED_ADDR: "seed:8080"
+      IS_SEED: "false"
+    depends_on:
+      - seed
+    networks:
+      - cluster_net
+
+  node3:
+    build: .
+    container_name: node3
+    environment:
+      NODE_ADDR: "node3:8080"
+      SEED_ADDR: "seed:8080"
+      IS_SEED: "false"
+    depends_on:
+      - seed
+    networks:
+      - cluster_net
+
+networks:
+  cluster_net:
+
