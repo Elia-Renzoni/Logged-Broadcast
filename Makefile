@@ -9,5 +9,4 @@ test:
 	go test -v internal/cluster/members_test.go
 
 run_cluster:
-	docker-compose up
-
+	docker-compose up --scale node=5
