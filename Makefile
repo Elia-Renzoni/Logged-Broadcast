@@ -10,3 +10,6 @@ test:
 
 run_cluster:
 	docker-compose up --scale node=5
+
+stop_cluster:
+	docker-compose stop
