@@ -12,7 +12,7 @@ services:
   node:
     build: .
     environment:
-      host: "${HOSTNAME}"
+      host: "127.0.0.1"
       port: "8080"
       seed: "false"
     depends_on:
