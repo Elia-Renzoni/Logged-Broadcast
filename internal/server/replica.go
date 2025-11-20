@@ -22,11 +22,11 @@ type LoggedServer struct {
 	signaler     chan struct{}
 	wakeUp       chan struct{}
 	networkErr   error
-	inMemoryDB   cache.Bcache
+	inMemoryDB   *cache.Bcache
 	persistentDB *db.LogDB
 }
 
-func NewLoggedServer(addr, port string, c cache.Bcache, d *db.LogDB) *LoggedServer {
+func NewLoggedServer(addr, port string, c *cache.Bcache, d *db.LogDB) *LoggedServer {
 	tcpAddr, err := net.ResolveTCPAddr("tcp", net.JoinHostPort(addr, port))
 	if err != nil {
 		return nil

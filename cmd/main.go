@@ -39,7 +39,7 @@ func startServer(node server.Replica) {
 }
 
 func main() {
-	inMemoryMap := cache.Bcache{}
+	inMemoryMap := &cache.Bcache{}
 	diskStorage := db.NewDB()
 	defer func() {
 		if r := recover(); r != nil {
