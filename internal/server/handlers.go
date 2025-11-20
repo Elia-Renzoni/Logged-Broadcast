@@ -60,7 +60,7 @@ func setKVBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.Han
 			}
 
 			if msg.Key == "" || msg.Value == "" {
-				nack(w, errors.New("Empty Payload Elements!"))
+				nack(w, errors.New("empty payload elements"))
 				return
 			}
 
@@ -138,7 +138,7 @@ func fetchKvBucket(volatileBucketer cache.MemoryCache) http.Handler {
 				ack(w, []byte(value))
 				return
 			}
-			nack(w, errors.New("Key Not Found!"))
+			nack(w, errors.New("key Not found"))
 		},
 	)
 }

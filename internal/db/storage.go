@@ -43,14 +43,14 @@ func (l *LogDB) WriteMessage(content model.PersistentMessage, opType uint8) erro
 	fCheck, sCheck := isEmpty(senderInfo), isEmpty(messageContent)
 
 	if (fCheck || sCheck) || l.faultyStatus.Load() {
-		return errors.New("Write Operations Aborted Before Completion")
+		return errors.New("write operations aborted before completion")
 	}
 
 	fResult, fErr := l.instance.ExecContext(l.dbCtx, insertSenderStmt, senderInfo.Addr, senderInfo.Port)
 	sResult, sErr := l.instance.ExecContext(l.dbCtx, insertMessageStmt, messageContent.Endpoint, messageContent.Key, messageContent.Value)
 
 	if fErr != nil || sErr != nil {
-		return errors.New("Impossible to Operate INSERT statements")
+		return errors.New("impossible to operate insert statements")
 	}
 
 	fId, _ := fResult.LastInsertId()
@@ -58,7 +58,7 @@ func (l *LogDB) WriteMessage(content model.PersistentMessage, opType uint8) erro
 
 	_, err := l.instance.ExecContext(l.dbCtx, insertBufferStmt, opType, fId, sId)
 	if err != nil {
-		return errors.New("Impossible to Operate final INSERT statements: " + err.Error())
+		return errors.New("impossible to operate final insert statement: " + err.Error())
 	}
 
 	return nil
@@ -66,11 +66,11 @@ func (l *LogDB) WriteMessage(content model.PersistentMessage, opType uint8) erro
 
 func (l *LogDB) DeleteMessage(searchKey string) error {
 	if searchKey == "" {
-		return errors.New("Delete Message Operation Aborted due to empty search key")
+		return errors.New("delete message operation aborted due to empty search key")
 	}
 
 	if l.faultyStatus.Load() {
-		return errors.New("Unable to execute the operation due to a faulty database")
+		return errors.New("unable to execute the operation due to a faulty database")
 	}
 
 	var (
@@ -80,14 +80,17 @@ func (l *LogDB) DeleteMessage(searchKey string) error {
 	)
 
 	tx, err = l.instance.BeginTx(l.dbCtx, nil)
+	if err != nil {
+		return err
+	}
 	defer tx.Rollback()
 
 	if msgId = l.getMessageID(tx, searchKey); msgId == -1 {
-		return errors.New("Unable to find the stored message")
+		return errors.New("unable to find the stored message")
 	}
 
 	if senderId = l.getSenderId(tx, msgId); senderId == -1 {
-		return errors.New("Unable to find the stored message")
+		return errors.New("unable to find the stored message")
 	}
 
 	if dErr := l.deleteSender(tx, senderId); dErr != nil {
@@ -96,11 +99,11 @@ func (l *LogDB) DeleteMessage(searchKey string) error {
 
 	result, err := tx.ExecContext(l.dbCtx, deleteMessageStmt, searchKey)
 	if err != nil {
-		return errors.New("Some Errors Occured When Tried to Perform a Delete Message Operation " + err.Error())
+		return errors.New("some errors occured when tried to perform a delete message operation " + err.Error())
 	}
 
 	if result == nil {
-		return errors.New("Some Errors Occured When Tried to Peform a Delete Message Operation")
+		return errors.New("some errors occured when tried to peform a delete message operation")
 	}
 
 	if err := l.deleteFromBuffer(tx, senderId, msgId); err != nil {
@@ -136,11 +139,11 @@ func (l *LogDB) ShutdownDB() {
 
 func (l *LogDB) ChangeStatus(searchKey string) error {
 	if searchKey == "" {
-		return errors.New("Change status operation aborted due to empty search key")
+		return errors.New("change status operation aborted due to empty search key")
 	}
 
 	if l.faultyStatus.Load() {
-		return errors.New("Unable to execute the operation due to a faulty database")
+		return errors.New("unable to execute the operation due to a faulty database")
 	}
 
 	var (
@@ -158,7 +161,7 @@ func (l *LogDB) ChangeStatus(searchKey string) error {
 	defer tx.Rollback()
 
 	if msgId = l.getMessageID(tx, searchKey); msgId == -1 {
-		return errors.New("Unable to find the stored message")
+		return errors.New("unable to find the stored message")
 	}
 
 	result, err = tx.ExecContext(l.dbCtx, changeStatusToDelivered, msgId)
@@ -167,7 +170,7 @@ func (l *LogDB) ChangeStatus(searchKey string) error {
 	}
 
 	if result == nil {
-		return errors.New("Impossible to Operate UPDATE statements")
+		return errors.New("impossible to operate update statement")
 	}
 
 	tx.Commit()

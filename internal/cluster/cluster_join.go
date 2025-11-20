@@ -27,7 +27,7 @@ func RegisterToSeed(seedAddress, personalAddress string) {
 		res *http.Response
 		connErr error
 		timeSleeping = 500
-		retries int = 0
+		retries = 0
 		exitStatus bool
 	)
 

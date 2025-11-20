@@ -16,7 +16,7 @@ func AddMember(addr string) error {
 	defer lock.Unlock()
 
 	if addr == "" {
-		return errors.New("Empty Node Address!")
+		return errors.New("empty node address")
 	}
 
 	pGroup = append(pGroup, addr)
@@ -28,7 +28,7 @@ func RemoveMember(addr string) error {
 	defer lock.Unlock()
 
 	if addr == "" {
-		return errors.New("Empty Node Address!")
+		return errors.New("empty node address")
 	}
 
 	for index := range pGroup {

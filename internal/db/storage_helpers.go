@@ -66,7 +66,7 @@ func (l *LogDB) deleteSender(tx *sql.Tx, senderID int) error {
 	}
 
 	if result == nil {
-		return errors.New("Unable to execute the SQL statement")
+		return errors.New("unable to execute the sql statement")
 	}
 
 	return nil
