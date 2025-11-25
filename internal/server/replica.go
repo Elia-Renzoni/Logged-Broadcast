@@ -10,7 +10,7 @@ import (
 
 type Replica interface {
 	BindTCP()
-	ServeConns()
+	ServeConns(joiner chan struct{})
 }
 
 type LoggedServer struct {
@@ -54,11 +54,12 @@ func (ls *LoggedServer) BindTCP() {
 	ls.wakeUp <- struct{}{}
 }
 
-func (ls *LoggedServer) ServeConns() {
+func (ls *LoggedServer) ServeConns(joinSync chan struct{}) {
 	<- ls.wakeUp
 	r := InitRouter(ls.inMemoryDB, ls.persistentDB)
 	err := http.Serve(ls.lst, http.HandlerFunc(r.ServeRequest))
 	if err != nil {
 		log.Fatal(err)
 	}
+	<- joinSync
 }

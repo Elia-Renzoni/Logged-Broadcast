@@ -33,9 +33,9 @@ func init() {
 	}
 }
 
-func startServer(node server.Replica) {
+func startServer(node server.Replica, joiner chan struct{}) {
 	go node.BindTCP()
-	go node.ServeConns()
+	go node.ServeConns(joiner)
 }
 
 func main() {
@@ -50,5 +50,7 @@ func main() {
 		cluster.RegisterToSeed("127.0.0.1:6767", net.JoinHostPort(conf.address, conf.listenPort))
 	}
 	node := server.NewLoggedServer(conf.address, conf.listenPort, inMemoryMap, diskStorage)
-	startServer(node)
+	joiner := make(chan struct{})
+	startServer(node, joiner)
+	<- joiner
 }
