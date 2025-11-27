@@ -15,11 +15,6 @@ import (
 	"net"
 )
 
-const (
-	POST_SET_BUCKET string = "/addbk"
-	DELETE_BUCKET   string = "/delbk"
-)
-
 func addNodeToCluster() http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
