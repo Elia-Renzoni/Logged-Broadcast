@@ -3,18 +3,18 @@ services:
     build: .
     container_name: seed
     environment:
-      host: "127.0.0.1"
-      port: "6767"
-      seed: "true"
+      -host: "127.0.0.1"
+      -port: "6767"
+      -seed: "true"
     networks:
       - cluster_net
 
   node:
     build: .
     environment:
-      host: "127.0.0.1"
-      port: "8080"
-      seed: "false"
+      -host: "127.0.0.1"
+      -port: "8080"
+      -seed: "false"
     depends_on:
       - seed
     networks:
