@@ -24,6 +24,23 @@ func TestAddMember(t *testing.T) {
 	}
 }
 
+func TestAddMembers(t *testing.T) {
+	membs := []string{
+		"127.0.0.1:123",
+		"127.0.0.1:124",
+		"127.0.0.1:125",
+	}
+	err := cluster.AddMembers(membs)
+	if err != nil {
+		t.Fatalf("%s", err.Error())
+	}
+
+	var list = cluster.GetFullMembershipList()
+	if ok := slices.Contains(list, "127.0.0.1:125"); !ok {
+		t.Fail()
+	}
+}
+
 func TestRemoveMember(t *testing.T) {
 	e1 := cluster.AddMember("127.0.0.1:6767")
 	e2 := cluster.AddMember("127.0.0.1:5400")

@@ -23,7 +23,7 @@ func AddMember(addr string) error {
 	return nil
 }
 
-func AddMembers(addrs ...string) error {
+func AddMembers(addrs []string) error {
 	lock.Lock()
 	defer lock.Unlock()
 
