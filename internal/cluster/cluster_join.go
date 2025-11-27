@@ -102,10 +102,6 @@ func generateFullHttpEndpoint(seedAddress string) string {
 }
 
 func isNetError(err error) bool {
-	netErr, ok := err.(net.Error)
-	if !ok {
-		return false
-	}
-
-	return netErr.Timeout()
+	_, ok := err.(net.Error)
+	return ok
 }
