@@ -125,7 +125,7 @@ func removeKvBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.
 			}
 			majorityReached := broadcaster.DoBroadcast(nil, DELETE_DATA, DELETE_BUCKET)
 			if !majorityReached {
-				nack(w, errors.New("opreation aborte: quorum not reached"))
+				nack(w, errors.New("opreation aborted: quorum not reached"))
 				return
 			}
 
