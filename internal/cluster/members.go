@@ -27,14 +27,20 @@ func AddMembers(addrs []string) error {
 	lock.Lock()
 	defer lock.Unlock()
 
+	idempotencyMap := map[string]int{}
+
 	for _, addr := range addrs {
+		if _, ok := idempotencyMap[addr]; ok {
+			continue
+		} 
+		idempotencyMap[addr] = 0
 		if addr == "" {
 			return errors.New("empty node address")
 		}
 
 		pGroup = append(pGroup, addr)
 	}
-	
+
 	return nil
 }
 
