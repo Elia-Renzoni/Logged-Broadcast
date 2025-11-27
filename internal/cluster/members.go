@@ -63,3 +63,9 @@ func GetFullMembershipList() []string  {
 	defer lock.Unlock()
 	return pGroup
 }
+
+func HasMoreElements() bool {
+	lock.Lock()
+	defer lock.Unlock()
+	return len(pGroup) > 1
+}

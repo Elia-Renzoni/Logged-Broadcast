@@ -23,7 +23,7 @@ const (
 func RegisterToSeed(seedAddress, personalAddress string) {
 	var (
 		msg = model.BasicJoinMessage{
-			NodeCompleteAddress: personalAddress,
+			NodeCompleteAddress: []string{personalAddress},
 		}
 		res *http.Response
 		connErr error

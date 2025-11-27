@@ -38,9 +38,17 @@ func addNodeToCluster() http.Handler {
 			}
 
 			fmt.Println(msg.NodeCompleteAddress)
-			if err := cluster.AddMember(msg.NodeCompleteAddress); err != nil {
-				nack(w, err)
-				return
+			length := len(msg.NodeCompleteAddress)
+			if length > 1 {
+				if err := cluster.AddMembers(msg.NodeCompleteAddress); err != nil {
+					nack(w, err)
+					return
+				}
+			} else {
+				if err := cluster.AddMember(msg.NodeCompleteAddress[length - 1]); err != nil {
+					nack(w, err)
+					return
+				}
 			}
 
 			_, port, splitErr := net.SplitHostPort(r.RemoteAddr)
@@ -50,7 +58,14 @@ func addNodeToCluster() http.Handler {
 			}
 
 			if port == "6767" {
-				majorityReached := broadcaster.DoBroadcast(body, ADD_NODE)
+				dataToSpread := body
+				if ok := cluster.HasMoreElements(); ok {
+					list := cluster.GetFullMembershipList()
+					dataToSpread, _ = json.Marshal(model.BasicJoinMessage{
+						NodeCompleteAddress: list,
+					})
+				}
+				majorityReached := broadcaster.DoBroadcast(dataToSpread, ADD_NODE)
 				if !majorityReached {
 					nack(w, errors.New("operation aborted: quorum not reached"))
 					return
