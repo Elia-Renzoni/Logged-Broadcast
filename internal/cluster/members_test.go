@@ -41,6 +41,22 @@ func TestAddMembers(t *testing.T) {
 	}
 }
 
+func TestAddMembersWithIdempotency(t *testing.T) {
+	membs := []string{
+		"127.0.0.1:126",
+		"127.0.0.1:126",
+	}
+
+	err := cluster.AddMembers(membs)
+	if err != nil {
+		t.Fatalf("%s", err.Error())
+	}
+
+	if ok := cluster.HasMoreElements(); ok {
+		t.Fail()
+	}
+}
+
 func TestRemoveMember(t *testing.T) {
 	e1 := cluster.AddMember("127.0.0.1:6767")
 	e2 := cluster.AddMember("127.0.0.1:5400")
