@@ -32,5 +32,6 @@ type MessageContent struct {
 }
 
 type BasicJoinMessage struct {
+	SeedFlagOption      bool     `json:"seed"`
 	NodeCompleteAddress []string `json:"address"`
 }

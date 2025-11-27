@@ -46,17 +46,13 @@ func addNodeToCluster() http.Handler {
 				}
 			}
 
-			_, port, splitErr := net.SplitHostPort(r.RemoteAddr)
-			if splitErr != nil {
-				nack(w, splitErr)
-				return
-			}
 
-			if port == "6767" {
+			if msg.SeedFlagOption {
 				dataToSpread := body
 				if ok := cluster.HasMoreElements(); ok {
 					list := cluster.GetFullMembershipList()
 					dataToSpread, _ = json.Marshal(model.BasicJoinMessage{
+						SeedFlagOption:      false,
 						NodeCompleteAddress: list,
 					})
 				}

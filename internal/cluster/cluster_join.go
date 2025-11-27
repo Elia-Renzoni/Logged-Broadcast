@@ -23,6 +23,7 @@ const (
 func RegisterToSeed(seedAddress, personalAddress string) {
 	var (
 		msg = model.BasicJoinMessage{
+			SeedFlagOption:      true,
 			NodeCompleteAddress: []string{personalAddress},
 		}
 		res *http.Response
