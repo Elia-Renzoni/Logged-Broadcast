@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	POST_ADD_NODE   string = "/join"
+	POST_ADD_NODE   string = "/add-node"
 	POST_SET_BUCKET string = "/addbk"
 	DELETE_BUCKET   string = "/delbk"
 )
