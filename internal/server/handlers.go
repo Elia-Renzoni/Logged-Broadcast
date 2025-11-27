@@ -12,10 +12,10 @@ import (
 	"net/http"
 	"log-b/internal/db"
 	"fmt"
+	"net"
 )
 
 const (
-	POST_ADD_NODE   string = "/add-node"
 	POST_SET_BUCKET string = "/addbk"
 	DELETE_BUCKET   string = "/delbk"
 )
@@ -43,10 +43,18 @@ func addNodeToCluster() http.Handler {
 				return
 			}
 
-			majorityReached := broadcaster.DoBroadcast(body, ADD_NODE, POST_ADD_NODE)
-			if !majorityReached {
-				nack(w, errors.New("operation aborted: quorum not reached"))
+			_, port, splitErr := net.SplitHostPort(r.RemoteAddr)
+			if splitErr != nil {
+				nack(w, splitErr)
 				return
+			}
+
+			if port == "6767" {
+				majorityReached := broadcaster.DoBroadcast(body, ADD_NODE)
+				if !majorityReached {
+					nack(w, errors.New("operation aborted: quorum not reached"))
+					return
+				}
 			}
 
 			ack(w, []byte("Join Approved"))
@@ -99,7 +107,7 @@ func setKVBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.Han
 				return
 			}
 
-			majorityReached := broadcaster.DoBroadcast(body, SET_DATA, POST_SET_BUCKET)
+			majorityReached := broadcaster.DoBroadcast(body, SET_DATA)
 			if !majorityReached {
 				nack(w, errors.New("operation aborted: quorum not reached"))
 				return
@@ -125,7 +133,7 @@ func removeKvBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.
 				nack(w, err)
 				return
 			}
-			majorityReached := broadcaster.DoBroadcast(nil, DELETE_DATA, DELETE_BUCKET)
+			majorityReached := broadcaster.DoBroadcast(nil, DELETE_DATA)
 			if !majorityReached {
 				nack(w, errors.New("opreation aborted: quorum not reached"))
 				return
