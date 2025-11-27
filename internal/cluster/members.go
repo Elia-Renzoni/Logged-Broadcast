@@ -23,6 +23,21 @@ func AddMember(addr string) error {
 	return nil
 }
 
+func AddMembers(addrs ...string) error {
+	lock.Lock()
+	defer lock.Unlock()
+
+	for _, addr := range addrs {
+		if addr == "" {
+			return errors.New("empty node address")
+		}
+
+		pGroup = append(pGroup, addr)
+	}
+	
+	return nil
+}
+
 func RemoveMember(addr string) error {
 	lock.Lock()
 	defer lock.Unlock()
