@@ -11,6 +11,7 @@ import (
 	"log-b/model"
 	"net/http"
 	"log-b/internal/db"
+	"fmt"
 )
 
 const (
@@ -22,7 +23,7 @@ const (
 func addNodeToCluster() http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			var msg model.BasicMessage
+			var msg model.BasicJoinMessage
 			defer r.Body.Close()
 
 			body, err := io.ReadAll(r.Body)
@@ -36,7 +37,8 @@ func addNodeToCluster() http.Handler {
 				return
 			}
 
-			if err := cluster.AddMember(msg.Node); err != nil {
+			fmt.Println(msg.NodeCompleteAddress)
+			if err := cluster.AddMember(msg.NodeCompleteAddress); err != nil {
 				nack(w, err)
 				return
 			}

@@ -32,5 +32,5 @@ type MessageContent struct {
 }
 
 type BasicJoinMessage struct {
-	NodeCompleteAddress string
+	NodeCompleteAddress string `json:"address"`
 }
