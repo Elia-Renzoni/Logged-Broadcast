@@ -26,7 +26,7 @@ func TestDoBroadcast(t *testing.T) {
 	formCluster()
 	go startServers()
 	time.Sleep(1 * time.Second)
-	result := broadcaster.DoBroadcast([]byte("mockbytes"), broadcaster.SET_DATA, "/addbk")
+	result := broadcaster.DoBroadcast([]byte("mockbytes"), broadcaster.SET_DATA)
 	
 	// fail the test if the majority quorum is 
 	// not reached
@@ -40,7 +40,7 @@ func startServers() {
 	for _, node := range group {
 		go func(peer string) {
 			mux := http.NewServeMux()
-			mux.HandleFunc("/addbk", handleMessage)
+			mux.HandleFunc("/set-data", handleMessage)
 
 			err := http.ListenAndServe(peer, mux)
 			if err != nil {
