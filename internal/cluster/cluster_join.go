@@ -12,6 +12,7 @@ import (
 	"context"
 	"net"
 	"fmt"
+	"log"
 )
 
 const (
@@ -73,7 +74,9 @@ EXP_BACKOFF:
 			panic(err)
 		}
 
-		panic(data)
+		var msg model.BasicPositiveAck
+		json.Unmarshal(data, &msg)
+		log.Println(msg.Succ)
 	}
 }
 

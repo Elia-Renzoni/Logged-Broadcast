@@ -57,6 +57,7 @@ func (ls *LoggedServer) BindTCP() {
 func (ls *LoggedServer) ServeConns(joinSync chan struct{}) {
 	<- ls.wakeUp
 	r := InitRouter(ls.inMemoryDB, ls.persistentDB)
+	log.Println("Server ON...")
 	err := http.Serve(ls.lst, http.HandlerFunc(r.ServeRequest))
 	if err != nil {
 		log.Fatal(err)

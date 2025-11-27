@@ -43,6 +43,7 @@ func main() {
 	diskStorage := db.NewDB()
 	defer func() {
 		if r := recover(); r != nil {
+			log.Println("recovering...")
 			log.Fatal(r)
 		}
 	}()
