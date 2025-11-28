@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"log-b/internal/db"
 	"fmt"
-	"net"
 )
 
 func addNodeToCluster() http.Handler {
