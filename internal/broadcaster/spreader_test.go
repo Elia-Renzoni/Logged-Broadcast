@@ -11,13 +11,14 @@ import (
 
 
 func formCluster() {
-	e1 := cluster.AddMember("127.0.0.1:8080")
-	e2 := cluster.AddMember("127.0.0.1:8081")
-	e3 := cluster.AddMember("127.0.0.1:8082")
-	e4 := cluster.AddMember("127.0.0.1:8083")
+	err := cluster.AddMembers([]string{
+		"127.0.0.1:8080",
+		"127.0.0.1:8081",
+		"127.0.0.1:8082",
+		"127.0.0.1:8083",
+	})
 
-	switch {
-	case e1 != nil, e2 != nil, e3 != nil, e4 != nil:
+	if err != nil {
 		return
 	}
 }

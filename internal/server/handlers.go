@@ -32,19 +32,10 @@ func addNodeToCluster() http.Handler {
 			}
 
 			fmt.Println(msg.NodeCompleteAddress)
-			length := len(msg.NodeCompleteAddress)
-			if length > 1 {
-				if err := cluster.AddMembers(msg.NodeCompleteAddress); err != nil {
-					nack(w, err)
-					return
-				}
-			} else {
-				if err := cluster.AddMember(msg.NodeCompleteAddress[length - 1]); err != nil {
-					nack(w, err)
-					return
-				}
+			if err := cluster.AddMembers(msg.NodeCompleteAddress); err != nil {
+				nack(w, err)
+				return
 			}
-
 
 			if msg.SeedFlagOption {
 				dataToSpread := body

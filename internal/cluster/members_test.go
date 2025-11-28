@@ -7,6 +7,7 @@ import (
 	"slices"
 )
 
+/*
 func TestAddMember(t *testing.T) {
 	e1 := cluster.AddMember("127.0.0.1:7979")
 	e2 := cluster.AddMember("127.0.0.1:8080")
@@ -22,7 +23,7 @@ func TestAddMember(t *testing.T) {
 	if !ok {
 		t.Fail()
 	}
-}
+}*/
 
 func TestAddMembers(t *testing.T) {
 	membs := []string{
@@ -58,8 +59,8 @@ func TestAddMembersWithIdempotency(t *testing.T) {
 }
 
 func TestRemoveMember(t *testing.T) {
-	e1 := cluster.AddMember("127.0.0.1:6767")
-	e2 := cluster.AddMember("127.0.0.1:5400")
+	e1 := cluster.AddMembers([]string{"127.0.0.1:6767"})
+	e2 := cluster.AddMembers([]string{"127.0.0.1:5400"})
 
 	if e1 != nil || e2 != nil {
 		return
@@ -75,8 +76,8 @@ func TestRemoveMember(t *testing.T) {
 	}
 
 
-	e3 := cluster.AddMember("127.0.0.1:2222")
-	e4 := cluster.AddMember("127.0.0.1:5555")
+	e3 := cluster.AddMembers([]string{"127.0.0.1:2222"})
+	e4 := cluster.AddMembers([]string{"127.0.0.1:5555"})
 	if e3 != nil || e4 != nil {
 		return
 	}
