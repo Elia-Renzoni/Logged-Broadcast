@@ -7,24 +7,6 @@ import (
 	"slices"
 )
 
-/*
-func TestAddMember(t *testing.T) {
-	e1 := cluster.AddMember("127.0.0.1:7979")
-	e2 := cluster.AddMember("127.0.0.1:8080")
-	e3 := cluster.AddMember("127.0.0.1:8081")
-	
-	switch {
-	case e1 != nil, e2 != nil, e3 != nil:
-		return
-	}
-
-	var list = cluster.GetFullMembershipList()
-	ok := slices.Contains(list, "127.0.0.1:7979")
-	if !ok {
-		t.Fail()
-	}
-}*/
-
 func TestAddMembers(t *testing.T) {
 	membs := []string{
 		"127.0.0.1:123",
