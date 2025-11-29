@@ -13,3 +13,6 @@ run_cluster:
 
 stop_cluster:
 	docker-compose stop
+
+build:
+	go build cmd/main.go
