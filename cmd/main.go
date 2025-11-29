@@ -48,7 +48,7 @@ func main() {
 		}
 	}()
 	if !conf.seed {
-		cluster.RegisterToSeed("127.0.0.1:6767", net.JoinHostPort(conf.address, conf.listenPort))
+		go cluster.RegisterToSeed("127.0.0.1:6767", net.JoinHostPort(conf.address, conf.listenPort))
 	}
 	node := server.NewLoggedServer(conf.address, conf.listenPort, inMemoryMap, diskStorage)
 	joiner := make(chan struct{})
