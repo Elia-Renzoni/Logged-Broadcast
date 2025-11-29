@@ -58,7 +58,7 @@ func addNodeToCluster() http.Handler {
 	)
 }
 
-func setKVBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.Handler {
+func setKVBucket(volatileBucketer cache.MemoryCache, buffer db.Storage, peerDefaultSecret string) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			defer r.Body.Close() 
@@ -103,10 +103,12 @@ func setKVBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.Han
 				return
 			}
 
-			majorityReached := broadcaster.DoBroadcast(body, SET_DATA)
-			if !majorityReached {
-				nack(w, errors.New("operation aborted: quorum not reached"))
-				return
+			if msg.Secret == "" && msg.Secret != peerDefaultSecret {
+				majorityReached := broadcaster.DoBroadcast(body, SET_DATA)
+				if !majorityReached {
+					nack(w, errors.New("operation aborted: quorum not reached"))
+					return
+				}
 			}
 
 			if err := buffer.ChangeStatus(msg.Key); err != nil {
@@ -119,7 +121,7 @@ func setKVBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.Han
 	)
 }
 
-func removeKvBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.Handler {
+func removeKvBucket(volatileBucketer cache.MemoryCache, buffer db.Storage, peerDefaultSecret string) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			splitted := strings.Split(r.URL.Path, "/")
@@ -129,6 +131,8 @@ func removeKvBucket(volatileBucketer cache.MemoryCache, buffer db.Storage) http.
 				nack(w, err)
 				return
 			}
+
+			// todo -> handle secret management before broadcasting
 			majorityReached := broadcaster.DoBroadcast(nil, DELETE_DATA)
 			if !majorityReached {
 				nack(w, errors.New("opreation aborted: quorum not reached"))

@@ -32,11 +32,11 @@ func (ro Router) ServeRequest(w http.ResponseWriter, r *http.Request) {
 	matchedHandler.ServeHTTP(w, r)
 }
 
-func InitRouter(bucketer cache.MemoryCache, persistentBuffer db.Storage) Router {
+func InitRouter(bucketer cache.MemoryCache, persistentBuffer db.Storage, secret string) Router {
 	return Router{
 		ADD_NODE: addNodeToCluster(),
-		SET_DATA: setKVBucket(bucketer, persistentBuffer),
-		DELETE_DATA: removeKvBucket(bucketer, persistentBuffer),
+		SET_DATA: setKVBucket(bucketer, persistentBuffer, secret),
+		DELETE_DATA: removeKvBucket(bucketer, persistentBuffer, secret),
 		GET_DATA: fetchKvBucket(bucketer),
 	}
 }

@@ -24,9 +24,10 @@ type LoggedServer struct {
 	networkErr   error
 	inMemoryDB   *cache.Bcache
 	persistentDB *db.LogDB
+	serverSecret string
 }
 
-func NewLoggedServer(addr, port string, c *cache.Bcache, d *db.LogDB) *LoggedServer {
+func NewLoggedServer(addr, port string, c *cache.Bcache, d *db.LogDB, secret string) *LoggedServer {
 	tcpAddr, err := net.ResolveTCPAddr("tcp", net.JoinHostPort(addr, port))
 	if err != nil {
 		return nil
@@ -40,6 +41,7 @@ func NewLoggedServer(addr, port string, c *cache.Bcache, d *db.LogDB) *LoggedSer
 		wakeUp:       make(chan struct{}),
 		inMemoryDB:   c,
 		persistentDB: d,
+		serverSecret: secret,
 	}
 }
 
@@ -56,7 +58,7 @@ func (ls *LoggedServer) BindTCP() {
 
 func (ls *LoggedServer) ServeConns(joinSync chan struct{}) {
 	<- ls.wakeUp
-	r := InitRouter(ls.inMemoryDB, ls.persistentDB)
+	r := InitRouter(ls.inMemoryDB, ls.persistentDB, ls.serverSecret)
 	log.Println("Server ON...")
 	err := http.Serve(ls.lst, http.HandlerFunc(r.ServeRequest))
 	if err != nil {
