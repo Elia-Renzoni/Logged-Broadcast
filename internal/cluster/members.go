@@ -11,18 +11,6 @@ var (
         lock sync.Mutex
 )
 
-/*
-func AddMember(addr string) error {
-	lock.Lock()
-	defer lock.Unlock()
-
-	if addr == "" {
-		return errors.New("empty node address")
-	}
-
-	pGroup = append(pGroup, addr)
-	return nil
-}*/
 
 func AddMembers(addrs []string) error {
 	lock.Lock()
