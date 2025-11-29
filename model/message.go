@@ -5,6 +5,7 @@ type BasicMessage struct {
 	Key      string `json:"key,omitempty"`
 	Value    string `json:"value,omitempty"`
 	Node     string `json:"add,omitempty"`
+	Secret   string `json:"secret,omitempty"`
 }
 
 type BasicError struct {
