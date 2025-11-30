@@ -17,10 +17,10 @@ stop_cluster:
 build:
 	go build cmd/main.go
 
-run_seed:
+run_seed: build
 	./cmd/main -host=127.0.0.1 -port=6767 -seed=true
 
-run_node:
+run_node: build
 	./cmd/main -host=$(word 2,$(MAKECMDGOALS)) \
 		   -port=$(word 3,$(MAKECMDGOALS)) \
 		   -seed=$(word 4,$(MAKECMDGOALS))
