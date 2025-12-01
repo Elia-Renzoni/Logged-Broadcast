@@ -5,12 +5,30 @@ import (
 	"os"
 	"log"
 	"time"
+	"log-b/model"
+	"encoding/json"
+	"bytes"
 )
 
 func main() {
+	var message  = model.BasicMessage{
+		Endpoint: "set-data",
+		Key:      "foo",
+		Value:    "bar",
+	}
+
 	process := http.Client{Timeout: 3 * time.Second}
 	// contact seed node for semplicity
-	req, err := http.NewRequest(http.MethodPost, "http://localhost:6767/set-data", nil)
+	data, mErr := json.Marshal(message)
+	if mErr != nil {
+		log.Fatalf("%s", mErr.Error())
+		os.Exit(1)
+	}
+	req, err := http.NewRequest(
+		http.MethodPost, 
+		"http://localhost:6767/set-data", 
+		bytes.NewBuffer(data),
+	)
 	if err != nil {
 		log.Fatalf("%s", err.Error())
 		os.Exit(1)
