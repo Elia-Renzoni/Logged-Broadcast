@@ -14,6 +14,9 @@ run_cluster:
 stop_cluster:
 	docker-compose stop
 
+run_client:
+	go run ./client/client.go
+
 build:
 	go build cmd/main.go
 
