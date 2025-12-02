@@ -34,7 +34,7 @@ func (b *Bcache) CloseDB() {
 	}
 }
 
-func (b Bcache) SetBucket(key, value string) {
+func (b *Bcache) SetBucket(key, value string) {
 	err := b.db.Update(func(txn *badger.Txn) error {
 		return txn.Set([]byte(key), []byte(value))
 	})
@@ -43,7 +43,7 @@ func (b Bcache) SetBucket(key, value string) {
 	}
 }
 
-func (b Bcache) DeleteBucket(key string) error {
+func (b *Bcache) DeleteBucket(key string) error {
 	err := b.db.Update(func(txn *badger.Txn) error {
 		return txn.Delete([]byte(key))
 	})
@@ -51,7 +51,7 @@ func (b Bcache) DeleteBucket(key string) error {
 	return err
 }
 
-func (b Bcache) FetchBucket(key string) string {
+func (b *Bcache) FetchBucket(key string) string {
 	var value []byte
 	var builder bytes.Buffer
 	

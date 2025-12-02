@@ -54,6 +54,7 @@ func main() {
 		go cluster.RegisterToSeed("127.0.0.1:6767", net.JoinHostPort(conf.address, conf.listenPort))
 	}
 
+	inMemoryMap.OpenDB()
 	node := server.NewLoggedServer(
 		conf.address, 
 		conf.listenPort, 
@@ -64,4 +65,5 @@ func main() {
 	joiner := make(chan struct{})
 	startServer(node, joiner)
 	<- joiner
+	inMemoryMap.CloseDB()
 }
