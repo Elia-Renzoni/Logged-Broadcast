@@ -23,7 +23,7 @@ func (b *Bcache) OpenDB() {
 	b.opts = badger.DefaultOptions("./cache")
 	b.db, b.err = badger.Open(b.opts)
 	if b.err != nil {
-		return
+		log.Fatalf("%s", b.err.Error())
 	}
 }
 
@@ -39,7 +39,7 @@ func (b *Bcache) SetBucket(key, value string) {
 		return txn.Set([]byte(key), []byte(value))
 	})
 	if err != nil {
-		return
+		log.Fatalf("%s", err.Error())
 	}
 }
 
