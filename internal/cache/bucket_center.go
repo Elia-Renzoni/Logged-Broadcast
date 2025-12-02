@@ -6,7 +6,6 @@ import (
 	"log"
 )
 
-
 type MemoryCache interface {
 	OpenDB()
 	SetBucket(key, value string)
