@@ -126,17 +126,19 @@ func removeKvBucket(volatileBucketer cache.MemoryCache, buffer db.Storage, peerD
 		func(w http.ResponseWriter, r *http.Request) {
 			splitted := strings.Split(r.URL.Path, "/")
 			key := splitted[2]
+			secret := splitted[3]
 			
 			if err := volatileBucketer.DeleteBucket(key); err != nil {
 				nack(w, err)
 				return
 			}
 
-			// todo -> handle secret management before broadcasting
-			majorityReached := broadcaster.DoBroadcast(nil, DELETE_DATA)
-			if !majorityReached {
-				nack(w, errors.New("opreation aborted: quorum not reached"))
-				return
+			if secret != "" && secret == peerDefaultSecret {
+				majorityReached := broadcaster.DoBroadcast(nil, DELETE_DATA)
+				if !majorityReached {
+					nack(w, errors.New("operation aborted: quorum not reached"))
+					return
+				}
 			}
 
 			if err := buffer.DeleteMessage(key); err != nil {
