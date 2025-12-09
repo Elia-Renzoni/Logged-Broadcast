@@ -3,11 +3,11 @@ package broadcaster
 import (
 	"bytes"
 	"context"
+	"errors"
 	"log"
 	"log-b/internal/cluster"
 	"net/http"
 	"time"
-	"errors"
 )
 
 const (
@@ -18,7 +18,7 @@ const (
 )
 
 func DoBroadcast(message []byte, methodRouter string) bool {
-	var memberlist = cluster.GetFullMembershipList()
+	memberlist := cluster.GetFullMembershipList()
 
 	do := func() bool {
 		var c ackCounter
@@ -36,7 +36,7 @@ func DoBroadcast(message []byte, methodRouter string) bool {
 
 		return c.isMajorityQuorumReached()
 	}
-	
+
 	return do()
 }
 
