@@ -1,16 +1,15 @@
 package cluster
 
 import (
-	"sync"
 	"errors"
 	"slices"
+	"sync"
 )
 
 var (
 	pGroup = []string{}
-        lock sync.Mutex
+	lock   sync.Mutex
 )
-
 
 func AddMembers(addrs []string) error {
 	lock.Lock()
@@ -21,7 +20,7 @@ func AddMembers(addrs []string) error {
 	for _, addr := range addrs {
 		if _, ok := idempotencyMap[addr]; ok {
 			continue
-		} 
+		}
 		idempotencyMap[addr] = 0
 		if addr == "" {
 			return errors.New("empty node address")
@@ -44,7 +43,7 @@ func RemoveMember(addr string) error {
 	for index := range pGroup {
 		if pGroup[index] == addr {
 			if index < len(pGroup) {
-				pGroup = slices.Delete(pGroup, index, index + 1)
+				pGroup = slices.Delete(pGroup, index, index+1)
 				break
 			}
 		}
@@ -53,7 +52,7 @@ func RemoveMember(addr string) error {
 	return nil
 }
 
-func GetFullMembershipList() []string  {
+func GetFullMembershipList() []string {
 	lock.Lock()
 	defer lock.Unlock()
 	return pGroup
@@ -63,4 +62,10 @@ func HasMoreElements() bool {
 	lock.Lock()
 	defer lock.Unlock()
 	return len(pGroup) > 1
+}
+
+func HasElements() bool {
+	lock.Lock()
+	defer lock.Unlock()
+	return len(pGroup) >= 1
 }

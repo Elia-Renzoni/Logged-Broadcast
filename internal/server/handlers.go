@@ -3,15 +3,15 @@ package server
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
-	"strings"
 	"log-b/internal/broadcaster"
 	"log-b/internal/cache"
 	"log-b/internal/cluster"
+	"log-b/internal/db"
 	"log-b/model"
 	"net/http"
-	"log-b/internal/db"
-	"fmt"
+	"strings"
 )
 
 func addNodeToCluster() http.Handler {
@@ -46,10 +46,13 @@ func addNodeToCluster() http.Handler {
 						NodeCompleteAddress: list,
 					})
 				}
-				majorityReached := broadcaster.DoBroadcast(dataToSpread, ADD_NODE)
-				if !majorityReached {
-					nack(w, errors.New("operation aborted: quorum not reached"))
-					return
+
+				if cluster.HasElements() {
+					majorityReached := broadcaster.DoBroadcast(dataToSpread, ADD_NODE)
+					if !majorityReached {
+						nack(w, errors.New("operation aborted: quorum not reached"))
+						return
+					}
 				}
 			}
 
@@ -61,8 +64,8 @@ func addNodeToCluster() http.Handler {
 func setKVBucket(volatileBucketer cache.MemoryCache, buffer db.Storage, peerDefaultSecret string) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			defer r.Body.Close() 
-			
+			defer r.Body.Close()
+
 			body, err := io.ReadAll(r.Body)
 			if err != nil {
 				nack(w, err)
@@ -81,7 +84,7 @@ func setKVBucket(volatileBucketer cache.MemoryCache, buffer db.Storage, peerDefa
 			}
 
 			volatileBucketer.SetBucket(msg.Key, msg.Value)
-			data, maErr := json.Marshal(model.BasicPositiveAck{Succ:"executed SET operation!"})
+			data, maErr := json.Marshal(model.BasicPositiveAck{Succ: "executed SET operation!"})
 			if maErr != nil {
 				nack(w, maErr)
 				return
@@ -89,13 +92,13 @@ func setKVBucket(volatileBucketer cache.MemoryCache, buffer db.Storage, peerDefa
 
 			dbErr := buffer.WriteMessage(model.PersistentMessage{
 				Sinfo: model.Sender{
-					Addr: r.RemoteAddr, 
+					Addr: r.RemoteAddr,
 					Port: "undefined",
 				},
 				Cinfo: model.MessageContent{
-					Endpoint: SET_DATA, 
-					Key: msg.Key,
-					Value: msg.Value,
+					Endpoint: SET_DATA,
+					Key:      msg.Key,
+					Value:    msg.Value,
 				},
 			}, 0)
 			if dbErr != nil {
@@ -103,7 +106,7 @@ func setKVBucket(volatileBucketer cache.MemoryCache, buffer db.Storage, peerDefa
 				return
 			}
 
-			if msg.Secret == "" && msg.Secret != peerDefaultSecret {
+			if msg.Secret == "" && msg.Secret != peerDefaultSecret && cluster.HasElements() {
 				majorityReached := broadcaster.DoBroadcast(body, SET_DATA)
 				if !majorityReached {
 					nack(w, errors.New("operation aborted: quorum not reached"))
@@ -115,7 +118,7 @@ func setKVBucket(volatileBucketer cache.MemoryCache, buffer db.Storage, peerDefa
 				nack(w, err)
 				return
 			}
-			
+
 			ack(w, data)
 		},
 	)
@@ -127,13 +130,13 @@ func removeKvBucket(volatileBucketer cache.MemoryCache, buffer db.Storage, peerD
 			splitted := strings.Split(r.URL.Path, "/")
 			key := splitted[2]
 			secret := splitted[3]
-			
+
 			if err := volatileBucketer.DeleteBucket(key); err != nil {
 				nack(w, err)
 				return
 			}
 
-			if secret != "" && secret == peerDefaultSecret {
+			if secret != "" && secret == peerDefaultSecret && cluster.HasElements() {
 				majorityReached := broadcaster.DoBroadcast(nil, DELETE_DATA)
 				if !majorityReached {
 					nack(w, errors.New("operation aborted: quorum not reached"))
@@ -175,7 +178,7 @@ func nack(w io.Writer, err error) {
 		Error: err.Error(),
 	})
 
-	if err != nil  {
+	if err != nil {
 		w.Write([]byte(err.Error()))
 		return
 	}
