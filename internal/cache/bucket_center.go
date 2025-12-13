@@ -1,9 +1,10 @@
 package cache
 
 import (
-	badger "github.com/dgraph-io/badger"
 	"bytes"
 	"log"
+
+	badger "github.com/dgraph-io/badger"
 )
 
 type MemoryCache interface {
@@ -11,11 +12,12 @@ type MemoryCache interface {
 	SetBucket(key, value string)
 	DeleteBucket(key string) error
 	FetchBucket(key string) string
+	CloseDB()
 }
 
 type Bcache struct {
-	db *badger.DB
-	err error
+	db   *badger.DB
+	err  error
 	opts badger.Options
 }
 
@@ -54,7 +56,7 @@ func (b *Bcache) DeleteBucket(key string) error {
 func (b *Bcache) FetchBucket(key string) string {
 	var value []byte
 	var builder bytes.Buffer
-	
+
 	err := b.db.View(func(txn *badger.Txn) error {
 		val, err := txn.Get([]byte(key))
 		if err != nil {
@@ -73,4 +75,3 @@ func (b *Bcache) FetchBucket(key string) string {
 	builder.Write(value)
 	return builder.String()
 }
-

@@ -1,13 +1,14 @@
 package db
 
 import (
-	"database/sql"
-	"time"
-	"log-b/model"
-	"sync/atomic"
-	"errors"
 	"context"
+	"database/sql"
+	"errors"
+	"log-b/model"
 	"slices"
+	"sync/atomic"
+	"time"
+
 	_ "github.com/glebarez/go-sqlite"
 )
 
@@ -30,13 +31,13 @@ type LogDB struct {
 func NewDB() *LogDB {
 	return &LogDB{
 		pingerTime: 3 * time.Second,
-		dbCtx: context.Background(),
+		dbCtx:      context.Background(),
 	}
 }
 
 func (l *LogDB) WriteMessage(content model.PersistentMessage, opType uint8) error {
 	var (
-		senderInfo = content.Sinfo
+		senderInfo     = content.Sinfo
 		messageContent = content.Cinfo
 	)
 
@@ -74,9 +75,9 @@ func (l *LogDB) DeleteMessage(searchKey string) error {
 	}
 
 	var (
-		err error
+		err             error
 		msgId, senderId int
-		tx *sql.Tx
+		tx              *sql.Tx
 	)
 
 	tx, err = l.instance.BeginTx(l.dbCtx, nil)
@@ -122,7 +123,7 @@ func (l *LogDB) StartDB() error {
 	if err != nil {
 		return err
 	}
-	
+
 	l.instance.SetMaxOpenConns(30)
 	l.instance.SetConnMaxIdleTime(2 * time.Second)
 	l.instance.SetMaxIdleConns(5)
@@ -147,9 +148,9 @@ func (l *LogDB) ChangeStatus(searchKey string) error {
 	}
 
 	var (
-		tx *sql.Tx
-		err error
-		msgId int
+		tx     *sql.Tx
+		err    error
+		msgId  int
 		result sql.Result
 	)
 
@@ -196,7 +197,7 @@ func (l *LogDB) pinger() {
 }
 
 func isEmpty(msg any) bool {
-	var ok bool 
+	var ok bool
 
 	switch value := msg.(type) {
 	case model.Sender:
