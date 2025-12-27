@@ -29,10 +29,10 @@ build:
 
 run_seed: build
 	@echo "Running seed node..."
-	./$(BINARY) -host=127.0.0.1 -port=6767 -seed=true
+	./$(BINARY) -host=127.0.0.1 -port=6767 -seed=true -secret=foo
 
 # Usage: make run_node <host> <port> <seed-flag>
 # example: make run_node 127.0.0.1 8081 false
 run_node: build
 	@echo "Running node..."
-	./$(BINARY) -host=$(word 2,$(MAKECMDGOALS)) -port=$(word 3,$(MAKECMDGOALS)) -seed=$(word 4,$(MAKECMDGOALS))
+	./$(BINARY) -host=$(word 2,$(MAKECMDGOALS)) -port=$(word 3,$(MAKECMDGOALS)) -seed=$(word 4,$(MAKECMDGOALS)) -secret=$(word 5,$(MAKECMDGOALS))

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"log-b/internal/broadcaster"
 	"log-b/internal/cache"
 	"log-b/internal/cluster"
@@ -106,12 +107,16 @@ func setKVBucket(volatileBucketer cache.MemoryCache, buffer db.Storage, peerDefa
 				return
 			}
 
-			if msg.Secret == "" && msg.Secret != peerDefaultSecret && cluster.HasElements() {
+			if msg.Secret == "" && cluster.HasElements() {
+				msg.Secret = peerDefaultSecret
+				body, _ := json.Marshal(msg)
 				majorityReached := broadcaster.DoBroadcast(body, SET_DATA)
 				if !majorityReached {
 					nack(w, errors.New("operation aborted: quorum not reached"))
 					return
 				}
+				// debugging
+				log.Println("quorum reached")
 			}
 
 			if err := buffer.ChangeStatus(msg.Key); err != nil {
