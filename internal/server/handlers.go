@@ -141,12 +141,17 @@ func removeKvBucket(volatileBucketer cache.MemoryCache, buffer db.Storage, peerD
 				return
 			}
 
-			if secret != "" && secret == peerDefaultSecret && cluster.HasElements() {
-				majorityReached := broadcaster.DoBroadcast(nil, DELETE_DATA)
+			if secret != "" && cluster.HasElements() {
+				majorityReached := broadcaster.DoBroadcast(
+					nil,
+					DELETE_DATA+"/"+key+"/"+peerDefaultSecret,
+				)
 				if !majorityReached {
 					nack(w, errors.New("operation aborted: quorum not reached"))
 					return
 				}
+				// debugging
+				log.Println("quorum reached")
 			}
 
 			if err := buffer.DeleteMessage(key); err != nil {
