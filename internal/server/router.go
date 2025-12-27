@@ -1,18 +1,18 @@
 package server
 
-
 import (
-	"net/http"
-	"net/url"
 	"log-b/internal/cache"
 	"log-b/internal/db"
+	"net/http"
+	"net/url"
+	"strings"
 )
 
 const (
-	ADD_NODE    = "/add-node"
-	SET_DATA    = "/set-data"
-	DELETE_DATA = "/delete-data"
-	GET_DATA    = "/get-data"
+	ADD_NODE    = "add-node"
+	SET_DATA    = "set-data"
+	DELETE_DATA = "delete-data"
+	GET_DATA    = "get-data"
 )
 
 type Router map[string]http.Handler
@@ -34,21 +34,21 @@ func (ro Router) ServeRequest(w http.ResponseWriter, r *http.Request) {
 
 func InitRouter(bucketer cache.MemoryCache, persistentBuffer db.Storage, secret string) Router {
 	return Router{
-		ADD_NODE: addNodeToCluster(),
-		SET_DATA: setKVBucket(bucketer, persistentBuffer, secret),
+		ADD_NODE:    addNodeToCluster(),
+		SET_DATA:    setKVBucket(bucketer, persistentBuffer, secret),
 		DELETE_DATA: removeKvBucket(bucketer, persistentBuffer, secret),
-		GET_DATA: fetchKvBucket(bucketer),
+		GET_DATA:    fetchKvBucket(bucketer),
 	}
 }
 
 func getEndpoint(u *url.URL) string {
-	return u.Path
+	return strings.Split(u.Path, "/")[1]
 }
 
 func isEndpointLegit(endpoint string) bool {
 	switch endpoint {
-		case ADD_NODE, SET_DATA, DELETE_DATA, GET_DATA:
-			return true
+	case ADD_NODE, SET_DATA, DELETE_DATA, GET_DATA:
+		return true
 	}
 	return false
 }

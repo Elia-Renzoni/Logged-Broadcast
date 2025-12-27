@@ -44,4 +44,50 @@ func main() {
 		os.Exit(1)
 	}
 	log.Print(string(resData))
+	res.Body.Close()
+
+	getReq, getErr := http.NewRequest(
+		http.MethodGet,
+		"http://localhost:6767/get-data/foo",
+		nil,
+	)
+	if getErr != nil {
+		log.Fatal(getErr)
+		os.Exit(1)
+	}
+	getRes, getResErr := process.Do(getReq)
+	if getResErr != nil {
+		log.Fatal(getResErr)
+		os.Exit(1)
+	}
+	getData, getDataErr := io.ReadAll(getRes.Body)
+	if getDataErr != nil {
+		log.Fatal(getDataErr)
+		os.Exit(1)
+	}
+
+	log.Print(string(getData))
+	getRes.Body.Close()
+
+	request, erro := http.NewRequest(
+		http.MethodDelete,
+		"http://localhost:6767/delete-data/foo/foo",
+		nil,
+	)
+	if erro != nil {
+		log.Fatalf("%s", erro.Error())
+		os.Exit(1)
+	}
+	response, clientErro := process.Do(request)
+	if clientErro != nil {
+		log.Fatalf("%s", clientErro.Error())
+		os.Exit(1)
+	}
+	respData, resErr := io.ReadAll(response.Body)
+	if resErr != nil {
+		log.Fatalf("%s", resErr.Error())
+		os.Exit(1)
+	}
+	log.Print(string(respData))
+	response.Body.Close()
 }
