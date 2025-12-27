@@ -62,6 +62,8 @@ func main() {
 		log.Fatal(err)
 		return
 	}
+	// only for debugging
+	log.Printf("[Interface]: %v\n", diskStorage)
 	defer diskStorage.ShutdownDB()
 	node := server.NewLoggedServer(
 		conf.address,
