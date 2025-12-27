@@ -1,17 +1,18 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"io"
+	"log"
+	"log-b/model"
 	"net/http"
 	"os"
-	"log"
 	"time"
-	"log-b/model"
-	"encoding/json"
-	"bytes"
 )
 
 func main() {
-	var message  = model.BasicMessage{
+	var message = model.BasicMessage{
 		Endpoint: "set-data",
 		Key:      "foo",
 		Value:    "bar",
@@ -25,8 +26,8 @@ func main() {
 		os.Exit(1)
 	}
 	req, err := http.NewRequest(
-		http.MethodPost, 
-		"http://localhost:6767/set-data", 
+		http.MethodPost,
+		"http://localhost:6767/set-data",
 		bytes.NewBuffer(data),
 	)
 	if err != nil {
@@ -38,5 +39,9 @@ func main() {
 		log.Fatalf("%s", clientErr.Error())
 		os.Exit(1)
 	}
-	log.Print(res)
+	resData, e := io.ReadAll(res.Body)
+	if e != nil {
+		os.Exit(1)
+	}
+	log.Print(string(resData))
 }
