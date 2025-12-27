@@ -41,6 +41,10 @@ func (l *LogDB) WriteMessage(content model.PersistentMessage, opType uint8) erro
 		messageContent = content.Cinfo
 	)
 
+	if l == nil || l.instance == nil {
+		return errors.New("nil pointer instance")
+	}
+
 	fCheck, sCheck := isEmpty(senderInfo), isEmpty(messageContent)
 
 	if (fCheck || sCheck) || l.faultyStatus.Load() {

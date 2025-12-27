@@ -73,5 +73,4 @@ func main() {
 	joiner := make(chan struct{})
 	startServer(node, joiner)
 	<-joiner
-	inMemoryMap.CloseDB()
 }
