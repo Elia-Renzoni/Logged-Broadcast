@@ -57,10 +57,12 @@ func main() {
 	}
 
 	inMemoryMap.OpenDB()
+	defer inMemoryMap.CloseDB()
 	if err := diskStorage.StartDB(); err != nil {
 		log.Fatal(err)
 		return
 	}
+	defer diskStorage.ShutdownDB()
 	node := server.NewLoggedServer(
 		conf.address,
 		conf.listenPort,
