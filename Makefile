@@ -1,3 +1,9 @@
+
+BINARY := cmd/main
+PACKAGE := cmd/main.go
+
+.PHONY: lint test build run_cluster stop_cluster run_client run_seed run_node
+
 lint:
 	golangci-lint run
 
@@ -18,14 +24,15 @@ run_client:
 	go run ./client/client.go
 
 build:
-	go build cmd/main.go
+	@echo "Building $(BINARY)..."
+	go build -o $(BINARY) $(PACKAGE)
 
 run_seed: build
-	./cmd/main -host=127.0.0.1 -port=6767 -seed=true
+	@echo "Running seed node..."
+	./$(BINARY) -host=127.0.0.1 -port=6767 -seed=true
 
+# Usage: make run_node <host> <port> <seed-flag>
+# example: make run_node 127.0.0.1 8081 false
 run_node: build
-	./cmd/main -host=$(word 2,$(MAKECMDGOALS)) \
-		   -port=$(word 3,$(MAKECMDGOALS)) \
-		   -seed=$(word 4,$(MAKECMDGOALS))
-%:
-	@:
+	@echo "Running node..."
+	./$(BINARY) -host=$(word 2,$(MAKECMDGOALS)) -port=$(word 3,$(MAKECMDGOALS)) -seed=$(word 4,$(MAKECMDGOALS))
