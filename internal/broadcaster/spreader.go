@@ -7,14 +7,15 @@ import (
 	"log"
 	"log-b/internal/cluster"
 	"net/http"
+	"strings"
 	"time"
 )
 
 const (
 	header      string = "application/json"
-	ADD_NODE    string = "/add-node"
-	SET_DATA    string = "/set-data"
-	DELETE_DATA string = "/delete-data"
+	ADD_NODE    string = "add-node"
+	SET_DATA    string = "set-data"
+	DELETE_DATA string = "delete-data"
 )
 
 func DoBroadcast(message []byte, methodRouter string) bool {
@@ -23,7 +24,7 @@ func DoBroadcast(message []byte, methodRouter string) bool {
 	do := func() bool {
 		var c ackCounter
 		for _, node := range memberlist {
-			endsystem := "http://" + node + methodRouter
+			endsystem := "http://" + node + "/" + methodRouter
 			eval, err := send(endsystem, message, methodRouter)
 			if err != nil {
 				log.Fatal(err.Error())
@@ -55,14 +56,15 @@ func send(addr string, msg []byte, methodRouter string) (bool, error) {
 	case ADD_NODE, SET_DATA:
 		req, err = http.NewRequestWithContext(ctx, http.MethodPost, addr, bytes.NewBuffer(msg))
 		if err != nil {
+			log.Println(err.Error())
 			return false, errors.New(makeError(err))
 		}
 		req.Header.Set("Content-Type", header)
 		res, err = client.Do(req)
-
-	case DELETE_DATA:
+	case getPrefix(methodRouter):
 		req, err = http.NewRequestWithContext(ctx, http.MethodDelete, addr, nil)
 		if err != nil {
+			log.Println(err.Error())
 			return false, errors.New(makeError(err))
 		}
 
@@ -71,6 +73,7 @@ func send(addr string, msg []byte, methodRouter string) (bool, error) {
 	}
 
 	if err != nil {
+		log.Fatal(err.Error())
 		return false, errors.New(makeError(err))
 	}
 
@@ -83,4 +86,11 @@ func evaluateAck(res *http.Response) bool {
 
 func makeError(err error) string {
 	return "Error during Dial Broadcasting " + err.Error()
+}
+
+func getPrefix(endpoint string) string {
+	if strings.Contains(endpoint, DELETE_DATA) {
+		return endpoint
+	}
+	return ""
 }
