@@ -70,6 +70,8 @@ func send(addr string, msg []byte, methodRouter string) (bool, error) {
 
 		req.Header.Set("Content-Type", header)
 		res, err = client.Do(req)
+	default:
+		return false, errors.New("invalid method router")
 	}
 
 	if err != nil {
