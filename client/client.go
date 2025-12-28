@@ -71,7 +71,7 @@ func main() {
 
 	request, erro := http.NewRequest(
 		http.MethodDelete,
-		"http://localhost:6767/delete-data/foo/foo",
+		"http://localhost:6767/delete-data/foo",
 		nil,
 	)
 	if erro != nil {

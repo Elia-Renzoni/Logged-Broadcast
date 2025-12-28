@@ -132,16 +132,21 @@ func setKVBucket(volatileBucketer cache.MemoryCache, buffer db.Storage, peerDefa
 func removeKvBucket(volatileBucketer cache.MemoryCache, buffer db.Storage, peerDefaultSecret string) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
+			var (
+				key, secret string
+			)
 			splitted := strings.Split(r.URL.Path, "/")
-			key := splitted[2]
-			secret := splitted[3]
+			key = splitted[2]
+			if len(splitted) >= 4 {
+				secret = splitted[3]
+			}
 
 			if err := volatileBucketer.DeleteBucket(key); err != nil {
 				nack(w, err)
 				return
 			}
 
-			if secret != "" && cluster.HasElements() {
+			if secret == "" && cluster.HasElements() {
 				majorityReached := broadcaster.DoBroadcast(
 					nil,
 					DELETE_DATA+"/"+key+"/"+peerDefaultSecret,
